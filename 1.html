@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner de Faturas - Restaurante</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-5">
+
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">Scanner de Faturas</h2>
+        
+        <div id="reader" class="w-full bg-black rounded-lg"></div>
+
+        <div id="result" class="mt-4 p-4 bg-green-50 border border-green-200 rounded hidden">
+            <p class="text-sm font-semibold text-green-800">Fatura Detectada!</p>
+            <p id="scanned-data" class="text-xs break-all text-gray-600"></p>
+            <button onclick="processarFatura()" class="mt-2 w-full bg-blue-600 text-white py-2 rounded font-bold">
+                Importar Itens e Valores
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Para o scanner após leitura bem-sucedida
+            html5QrcodeScanner.clear();
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('scanned-data').innerText = "URL: " + decodedText;
+            
+            // Aqui você enviaria o link para o seu backend para fazer o scraping
+            console.log("Dados da fatura:", decodedText);
+        }
+
+        function onScanFailure(error) {
+            // Erros de leitura (comum enquanto a câmara foca) - ignoramos
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: {width: 250, height: 250} }
+        );
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+        function processarFatura() {
+            alert("A enviar para o servidor para extrair Fornecedor, Artigos e Preços...");
+            // Integração com API de scraping ou OCR aqui
+        }
+    </script>
+</body>
+</html>
