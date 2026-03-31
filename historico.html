@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Histórico - RestoCheck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-[#F8FAFC] pb-40 font-sans antialiased text-slate-900">
+
+    <header class="p-6 bg-white border-b border-slate-100 sticky top-0 z-30">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Histórico</h1>
+        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Registo de Compras</p>
+    </header>
+
+    <main id="lista-historico" class="p-6 space-y-4">
+        <p class="text-center py-20 text-slate-400 font-black uppercase text-[10px]">A carregar registos...</p>
+    </main>
+
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50 text-slate-400">
+        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house"></i></a>
+        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open"></i></a>
+        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg"><i class="fa-solid fa-qrcode text-white"></i></div></a>
+        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group"></i></a>
+        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-400"></i></a>
+    </nav>
+
+    <script>
+        async function carregarHistorico() {
+            const container = document.getElementById('lista-historico');
+            
+            try {
+                // Procuramos o histórico e os nomes dos produtos/fornecedores associados
+                const { data, error } = await _supabase
+                    .from('historico_compras')
+                    .select(`
+                        id, data, quantidade, preco_unitario,
+                        materias_primas ( nome, unidade ),
+                        fornecedores ( nome )
+                    `)
+                    .order('data', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<p class="text-center py-20 text-slate-400 font-bold uppercase text-[10px]">Sem registos de compras.</p>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                data.forEach(reg => {
+                    const dataFormatada = new Date(reg.data).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    
+                    container.innerHTML += `
+                        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="font-black text-slate-800 text-sm uppercase">${reg.materias_primas?.nome || 'Artigo Removido'}</h3>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${dataFormatada}</p>
+                                </div>
+                                <span class="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">
+                                    ${reg.fornecedores?.nome || 'S/ Fornecedor'}
+                                </span>
+                            </div>
+                            <div class="flex justify-between border-t border-slate-50 pt-3">
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase leading-none mb-1">Quantidade</p>
+                                    <p class="font-bold text-slate-700 text-xs">${reg.quantidade} ${reg.materias_primas?.unidade || ''}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-black text-slate-400 uppercase leading-none mb-1">Preço Un.</p>
+                                    <p class="font-black text-slate-900 text-xs">${reg.preco_unitario.toFixed(2)}€</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                container.innerHTML = `<p class="text-red-500 text-center text-xs font-bold">Erro ao carregar histórico: ${err.message}</p>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarHistorico);
+    </script>
+</body>
+</html>
