@@ -8,82 +8,67 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 pb-32 font-sans antialiased text-slate-900">
+<body class="bg-[#F8FAFC] pb-40 font-sans antialiased text-slate-900">
 
-    <nav class="sticky top-0 z-30 bg-slate-900 text-white p-5 rounded-b-[2rem] shadow-xl">
+    <nav class="sticky top-0 z-30 bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-xl">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <p class="text-xs text-slate-400 font-medium">Bem-vindo, DonTasko</p>
-                <h1 class="text-xl font-bold italic tracking-tighter">RESTO<span class="text-orange-500 italic">CHECK</span></h1>
+                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Bem-vindo, DonTasko</p>
+                <h1 class="text-xl font-black italic tracking-tighter uppercase">Resto<span class="text-orange-500">Check</span></h1>
             </div>
-            <div class="relative">
-                <i class="fa-solid fa-circle-user text-2xl text-slate-400"></i>
-            </div>
+            <a href="relatorios.html" class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700">
+                <i class="fa-solid fa-chart-line text-orange-400"></i>
+            </a>
         </div>
 
-        <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700">
-            <div class="flex justify-between items-end mb-2">
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Gastos Totais</span>
-                <span class="text-2xl font-black text-orange-400">4.285€</span>
+        <div class="bg-slate-800 rounded-[2rem] p-5 border border-slate-700 shadow-inner">
+            <div class="flex justify-between items-end mb-3">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gastos Mensais</span>
+                <span class="text-2xl font-black text-white">4.285€</span>
             </div>
             <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                <div class="bg-orange-500 h-full w-[75%] shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
+                <div class="bg-orange-500 h-full w-[75%] shadow-[0_0_15px_rgba(249,115,22,0.6)]"></div>
             </div>
         </div>
     </nav>
 
-    <main class="px-5 -mt-6">
-        
+    <main class="px-6 -mt-6">
         <div class="flex gap-4 overflow-x-auto no-scrollbar snap-x mb-8 pt-2">
-            <div class="min-w-[160px] snap-center p-4 rounded-3xl bg-white border border-slate-100 shadow-sm">
-                <p class="text-xs font-bold text-red-500"><i class="fa-solid fa-arrow-trend-up mr-2"></i>Carne</p>
-                <p class="text-[10px] text-slate-500 leading-tight mt-1">Preço subiu 12% na última fatura.</p>
+            <div class="min-w-[160px] snap-center p-4 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
+                <p class="text-[10px] font-black text-red-500 uppercase mb-1">Inflação: Carne</p>
+                <p class="text-xs text-slate-600 font-bold leading-tight">+12% na última compra</p>
             </div>
-            <div class="min-w-[160px] snap-center p-4 rounded-3xl bg-white border border-slate-100 shadow-sm">
-                <p class="text-xs font-bold text-emerald-500"><i class="fa-solid fa-check mr-2"></i>Margem</p>
-                <p class="text-[10px] text-slate-500 leading-tight mt-1">Média de 72% nos pratos principais.</p>
+            <div class="min-w-[160px] snap-center p-4 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
+                <p class="text-[10px] font-black text-emerald-500 uppercase mb-1">Margem Ok</p>
+                <p class="text-xs text-slate-600 font-bold leading-tight">Média de 72% nos pratos</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-[2rem] p-6 shadow-sm mb-6 border border-slate-100">
-            <h3 class="font-bold text-slate-800 mb-6">Gastos por Categoria</h3>
+        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 mb-6">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Custos por Categoria</h3>
             <div class="h-56">
                 <canvas id="mainDashboardChart"></canvas>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-            <a href="scan.html" class="bg-orange-500 text-white p-6 rounded-[2rem] shadow-lg shadow-orange-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
+            <a href="scan.html" class="bg-orange-500 text-white p-6 rounded-[2.5rem] shadow-xl shadow-orange-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
                 <i class="fa-solid fa-qrcode text-2xl"></i>
-                <span class="font-black text-[10px] uppercase tracking-widest text-center leading-tight">Scannear<br>Fatura</span>
+                <span class="font-black text-[10px] uppercase tracking-widest text-center leading-tight">Scanner<br>Fatura</span>
             </a>
-            <a href="relatorios.html" class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
-                <i class="fa-solid fa-chart-pie text-2xl text-blue-500"></i>
-                <span class="font-black text-[10px] text-slate-700 uppercase tracking-widest">Ver Análises</span>
+            <a href="relatorios.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
+                <i class="fa-solid fa-file-invoice-dollar text-2xl text-blue-500"></i>
+                <span class="font-black text-[10px] text-slate-700 uppercase tracking-widest text-center leading-tight">Ver<br>Relatórios</span>
             </a>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-4 shadow-2xl border border-white/10 z-50">
-        <a href="index.html" class="text-orange-400 flex flex-col items-center">
-            <i class="fa-solid fa-house"></i>
-            <span class="text-[8px] mt-1 font-bold uppercase">Início</span>
-        </a>
-        <a href="mp.html" class="text-slate-400 flex flex-col items-center">
-            <i class="fa-solid fa-box-open"></i>
-            <span class="text-[8px] mt-1 font-bold uppercase">Stock</span>
-        </a>
-        <a href="scan.html" class="bg-orange-500 w-14 h-14 rounded-full -mt-12 border-[6px] border-slate-50 flex items-center justify-center text-white text-xl shadow-lg shadow-orange-200">
-            <i class="fa-solid fa-qrcode"></i>
-        </a>
-        <a href="categorias.html" class="text-slate-400 flex flex-col items-center">
-            <i class="fa-solid fa-layer-group"></i>
-            <span class="text-[8px] mt-1 font-bold uppercase">Categorias</span>
-        </a>
-        <a href="receitas.html" class="text-slate-400 flex flex-col items-center">
-            <i class="fa-solid fa-utensils"></i>
-            <span class="text-[8px] mt-1 font-bold uppercase">Receitas</span>
-        </a>
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
+        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-orange-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-orange-400">Início</span></a>
+        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
+        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
+        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
+        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Receitas</span></a>
     </nav>
 
     <script>
@@ -91,23 +76,10 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Carne', 'Bebida', 'Outros'],
-                datasets: [{
-                    data: [1850, 1100, 415],
-                    backgroundColor: ['#f97316', '#3b82f6', '#94a3b8'],
-                    borderRadius: 15,
-                    borderSkipped: false,
-                }]
+                labels: ['Carne', 'Bebida', 'Limpeza'],
+                datasets: [{ data: [1850, 1100, 415], backgroundColor: ['#f97316', '#3b82f6', '#94a3b8'], borderRadius: 15 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { grid: { display: false }, border: { display: false } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, border: { display: false } } } }
         });
     </script>
 </body>
