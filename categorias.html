@@ -93,7 +93,7 @@
         async function loadFornecedores() {
     const lista = document.getElementById('lista-fornecedores');
     try {
-        const { data, error } = await _supabase.from('fornecedores').select('*');
+        const { data, error } = await _supabase.from('Fornecedores').select('*');
         if (error) throw error;
 
         if (!data || data.length === 0) {
