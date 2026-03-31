@@ -2,7 +2,8 @@
 <html lang="pt">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+    <script src="supabase-config.js"></script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RestoCheck - Dashboard</title>
@@ -25,8 +26,8 @@
 
         <div class="bg-slate-800 rounded-[2rem] p-5 border border-slate-700 shadow-inner">
             <div class="flex justify-between items-end mb-3">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gastos Mensais</span>
-                <span class="text-2xl font-black text-white">4.285€</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gastos Totais (Stock)</span>
+                <span id="total-gastos" class="text-2xl font-black text-white">0,00€</span>
             </div>
             <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
                 <div class="bg-orange-500 h-full w-[75%] shadow-[0_0_15px_rgba(249,115,22,0.6)]"></div>
@@ -74,15 +75,42 @@
     </nav>
 
     <script>
-        const ctx = document.getElementById('mainDashboardChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Carne', 'Bebida', 'Limpeza'],
-                datasets: [{ data: [1850, 1100, 415], backgroundColor: ['#f97316', '#3b82f6', '#94a3b8'], borderRadius: 15 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, border: { display: false } } } }
-        });
+        async function inicializarDashboard() {
+            // 1. Puxar dados da tabela materias_primas
+            const { data, error } = await _supabase
+                .from('materias_primas')
+                .select('preco_atual, nome');
+
+            if (error) {
+                console.error("Erro Supabase:", error.message);
+                return;
+            }
+
+            // 2. Calcular Total
+            const total = data.reduce((acc, item) => acc + (item.preco_atual || 0), 0);
+            document.getElementById('total-gastos').innerText = formatarMoeda(total);
+
+            // 3. Atualizar o Gráfico com dados reais
+            const labels = data.map(item => item.nome).slice(0, 3); // Top 3 itens
+            const valores = data.map(item => item.preco_atual).slice(0, 3);
+
+            const ctx = document.getElementById('mainDashboardChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length > 0 ? labels : ['Sem Dados'],
+                    datasets: [{ 
+                        data: valores.length > 0 ? valores : [0], 
+                        backgroundColor: ['#f97316', '#3b82f6', '#94a3b8'], 
+                        borderRadius: 15 
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, border: { display: false } } } }
+            });
+        }
+
+        // Rodar ao carregar
+        document.addEventListener('DOMContentLoaded', inicializarDashboard);
     </script>
 </body>
 </html>
