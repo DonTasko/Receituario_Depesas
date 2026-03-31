@@ -1,86 +1,100 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Receitas - RestoCheck</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-slate-50 pb-40 font-sans antialiased text-slate-900">
+<main class="p-6 space-y-6">
+    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+        <h2 class="text-xl font-black tracking-tighter mb-6 uppercase">Nova Receita</h2>
+        
+        <div class="space-y-4">
+            <input type="text" id="nome-receita" placeholder="Nome da Receita (Ex: Bife)" class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 font-bold">
+            <input type="number" id="preco-venda" placeholder="Preço de Venda (€)" class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 font-bold">
+            
+            <hr class="my-6 border-slate-50">
+            <p class="text-[10px] font-black uppercase text-slate-400 italic">Adicionar Ingrediente</p>
+            
+            <div class="flex gap-2">
+                <select id="select-mp" class="flex-1 p-4 bg-slate-50 rounded-2xl border-none font-bold text-sm">
+                    </select>
+                <input type="number" id="qtd-ingrediente" placeholder="Qtd" class="w-20 p-4 bg-slate-50 rounded-2xl border-none font-bold">
+                <button onclick="adicionarIngredienteLista()" class="bg-slate-900 text-white w-12 h-12 rounded-xl flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
+            </div>
 
-    <header class="p-6 bg-white border-b border-slate-100 sticky top-0 z-30">
-        <h1 class="text-3xl font-black text-slate-900 tracking-tighter text-left">Receitas</h1>
-        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest text-left">Fichas Técnicas e Margens</p>
-    </header>
+            <ul id="lista-temp-ingredientes" class="space-y-2 mt-4">
+                </ul>
 
-    <main id="lista-receitas" class="p-6 space-y-4">
-        <p class="text-center py-20 text-slate-400 font-bold uppercase text-[10px]">A carregar dados...</p>
-    </main>
+            <button onclick="salvarReceitaCompleta()" id="btn-lançar" class="w-full bg-orange-500 text-white p-5 rounded-[2rem] font-black uppercase tracking-widest shadow-lg shadow-orange-200 mt-8">
+                Lançar Receita
+            </button>
+        </div>
+    </div>
+</main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl z-50 text-slate-400">
-        <a href="index.html"><i class="fa-solid fa-house"></i></a>
-        <a href="mp.html"><i class="fa-solid fa-box-open"></i></a>
-        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-50 flex items-center justify-center shadow-lg"><i class="fa-solid fa-qrcode text-white"></i></div></a>
-        <a href="categorias.html"><i class="fa-solid fa-layer-group"></i></a>
-        <a href="receitas.html" class="text-orange-400"><i class="fa-solid fa-utensils"></i></a>
-    </nav>
+<script>
+    let ingredientesParaSalvar = [];
 
-    <script>
-        async function carregarReceitas() {
-            const container = document.getElementById('lista-receitas');
-            try {
-                const { data, error } = await _supabase
-                    .from('receitas')
-                    .select(`
-                        *,
-                        ingredientes_receita (
-                            quantidade,
-                            materias_primas ( nome, preco_atual, unidade )
-                        )
-                    `);
+    // 1. Carrega as Matérias-Primas para o Select
+    async function loadMP() {
+        const { data } = await _supabase.from('materias_primas').select('*');
+        const select = document.getElementById('select-mp');
+        select.innerHTML = data.map(mp => `<option value="${mp.id}">${mp.nome} (${mp.unidade})</option>`).join('');
+    }
 
-                if (error) throw error;
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<p class="text-center py-20 text-slate-400 font-bold uppercase text-[10px]">Sem receitas registadas.</p>';
-                    return;
-                }
+    // 2. Adiciona à lista visual antes de salvar no banco
+    function adicionarIngredienteLista() {
+        const select = document.getElementById('select-mp');
+        const qtd = document.getElementById('qtd-ingrediente').value;
+        const nomeMp = select.options[select.selectedIndex].text;
 
-                container.innerHTML = '';
-                data.forEach(receita => {
-                    let custoTotal = 0;
-                    receita.ingredientes_receita?.forEach(ing => {
-                        const preco = ing.materias_primas?.preco_atual || 0;
-                        custoTotal += preco * ing.quantidade;
-                    });
+        if(!qtd) return alert("Coloca a quantidade!");
 
-                    const margem = receita.preco_venda > 0 ? ((receita.preco_venda - custoTotal) / receita.preco_venda * 100).toFixed(0) : 0;
+        ingredientesParaSalvar.push({ mp_id: select.value, quantidade: qtd, nome: nomeMp });
+        
+        document.getElementById('lista-temp-ingredientes').innerHTML += `
+            <li class="flex justify-between bg-slate-50 p-3 rounded-xl text-xs font-bold text-slate-600">
+                <span>${nomeMp}</span>
+                <span>${qtd}</span>
+            </li>`;
+    }
 
-                    container.innerHTML += `
-                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-                            <div class="flex justify-between items-start mb-4 text-left">
-                                <h2 class="font-black text-lg tracking-tighter uppercase text-slate-800">${receita.nome}</h2>
-                                <span class="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">${margem}% Margem</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4 text-left">
-                                <div>
-                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Custo Produção</p>
-                                    <p class="font-bold text-slate-700 text-sm">${custoTotal.toFixed(2)}€</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Preço Venda</p>
-                                    <p class="font-black text-slate-900 text-sm">${receita.preco_venda.toFixed(2)}€</p>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-            } catch (err) {
-                container.innerHTML = `<div class="bg-red-50 p-6 rounded-[2rem] text-center border border-red-100"><p class="text-red-500 font-black uppercase text-[10px]">Erro nas Foreign Keys</p></div>`;
-            }
+    // 3. O "Cérebro" do botão: Salva a receita e depois os ingredientes
+    async function salvarReceitaCompleta() {
+        const btn = document.getElementById('btn-lançar');
+        const nome = document.getElementById('nome-receita').value;
+        const preco = document.getElementById('preco-venda').value;
+
+        if(!nome || ingredientesParaSalvar.length === 0) return alert("Falta o nome ou ingredientes!");
+
+        btn.innerText = "A GUARDAR...";
+        btn.disabled = true;
+
+        try {
+            // A. Salva a Receita
+            const { data: receitaCriada, error: errR } = await _supabase
+                .from('receitas')
+                .insert([{ nome: nome, preco_venda: preco }])
+                .select();
+
+            if (errR) throw errR;
+
+            const receitaId = receitaCriada[0].id;
+
+            // B. Salva os Ingredientes ligados a esse ID
+            const rows = ingredientesParaSalvar.map(ing => ({
+                receita_id: receitaId,
+                mp_id: ing.mp_id,
+                quantidade: ing.quantidade
+            }));
+
+            const { error: errI } = await _supabase.from('ingredientes_receita').insert(rows);
+            if (errI) throw errI;
+
+            alert("Receita lançada com sucesso!");
+            window.location.reload();
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao salvar. Vê o console.");
+            btn.innerText = "LANÇAR RECEITA";
+            btn.disabled = false;
         }
-        document.addEventListener('DOMContentLoaded', carregarReceitas);
-    </script>
-</body>
-</html>
+    }
+
+    document.addEventListener('DOMContentLoaded', loadMP);
+</script>
