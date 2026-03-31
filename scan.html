@@ -1,89 +1,51 @@
-<body class="bg-[#F8FAFC] pb-32">
-
-    <header class="p-6 bg-white shadow-sm sticky top-0 z-30 rounded-b-[2.5rem]">
-        <div class="flex justify-between items-center mb-4">
-            <button class="text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 class="font-black text-slate-900 uppercase tracking-widest text-sm">Validar Fatura</h2>
-            <button class="text-orange-500 font-bold text-sm">Guardar</button>
-        </div>
-        <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-            <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white">
-                <i class="fa-solid fa-truck-fast"></i>
-            </div>
-            <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase">Fornecedor Identificado</p>
-                <h3 class="font-bold text-slate-800 text-sm">Talho do Mercado Lda.</h3>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validar Fatura - RestoCheck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-[#F8FAFC] pb-40 font-sans">
+    <header class="p-6 bg-white shadow-sm sticky top-0 z-30 rounded-b-[2.5rem] flex justify-between items-center">
+        <h2 class="font-black text-slate-900 uppercase tracking-widest text-xs">Validar Fatura</h2>
+        <a href="index.html" class="text-orange-500 font-bold text-xs uppercase">Concluir</a>
     </header>
 
-    <main class="p-6 space-y-6">
-        
-        <div class="flex justify-between items-center">
-            <h3 class="font-bold text-slate-800">Itens Extraídos (4)</h3>
-            <span class="text-xs font-bold text-slate-400">Total: 420.50€</span>
+    <main class="p-6 space-y-4">
+        <div class="flex items-center gap-4 p-4 bg-slate-900 rounded-[2rem] text-white">
+            <i class="fa-solid fa-truck-fast text-orange-400 text-xl"></i>
+            <div>
+                <p class="text-[10px] text-slate-400 font-black uppercase">Fatura de:</p>
+                <h3 class="font-bold text-sm">Talho do Mercado Lda.</h3>
+            </div>
         </div>
 
-        <div class="space-y-4">
-            
-            <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-emerald-100 relative overflow-hidden">
-                <div class="absolute right-4 top-4 text-emerald-500 text-xs">
-                    <i class="fa-solid fa-circle-check"></i> Correspondência 100%
-                </div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Na Fatura: "Picanha Argentina Premium"</p>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h4 class="font-black text-slate-800">Carne de Vaca (Picanha)</h4>
-                        <p class="text-xs text-slate-500">12kg x 25.50€</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-black text-slate-900">306.00€</p>
-                    </div>
-                </div>
+        <div class="bg-white p-5 rounded-[2rem] border border-emerald-100">
+            <p class="text-[10px] text-slate-400 font-bold uppercase mb-2 italic">Correspondência 100%</p>
+            <div class="flex justify-between items-center">
+                <h4 class="font-black text-slate-800">Picanha (12kg)</h4>
+                <p class="font-black text-slate-900">306.00€</p>
             </div>
-
-            <div class="bg-orange-50 p-5 rounded-[2rem] border-2 border-dashed border-orange-200">
-                <div class="flex items-start gap-3 mb-3">
-                    <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-question text-xs"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-orange-700 font-black uppercase">Artigo Novo Detetado</p>
-                        <h4 class="font-bold text-slate-800 italic">"CHOURIÇO CASEIRO REGIONAL"</h4>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-[10px] text-slate-500 font-medium leading-tight">Não encontramos este item no seu stock. Como deseja registar?</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button class="bg-white py-2 rounded-xl text-[10px] font-black text-slate-700 border border-slate-200 uppercase tracking-tighter">Criar Novo</button>
-                        <button class="bg-slate-900 py-2 rounded-xl text-[10px] font-black text-white uppercase tracking-tighter">Associar Existente</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 relative">
-                <div class="absolute right-4 top-4 text-red-500 text-[10px] font-black animate-bounce">
-                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> +15% vs Última Compra
-                </div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Na Fatura: "Sal Marinho 25kg"</p>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h4 class="font-black text-slate-800">Sal Grosso</h4>
-                        <p class="text-xs text-slate-500">1 un x 12.00€</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-black text-slate-900">12.00€</p>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <button class="w-full bg-orange-500 text-white p-6 rounded-[2.5rem] shadow-xl shadow-orange-200 font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            Confirmar e Atualizar Stock
-        </button>
-
+        <div class="bg-orange-50 p-5 rounded-[2rem] border border-orange-200">
+            <p class="text-[10px] text-orange-600 font-black uppercase mb-2 italic">Artigo Novo Detetado</p>
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="font-black text-slate-800">Chouriço Caseiro</h4>
+                <p class="font-black text-slate-900">14.50€</p>
+            </div>
+            <button class="w-full bg-white py-2 rounded-xl text-[10px] font-black uppercase border border-orange-200 text-orange-600">Associar ao Stock</button>
+        </div>
     </main>
 
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
+        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Início</span></a>
+        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
+        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
+        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
+        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Receitas</span></a>
+    </nav>
 </body>
+</html>
