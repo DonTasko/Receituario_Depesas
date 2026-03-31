@@ -1,60 +1,50 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios - RestoCheck</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-[#F8FAFC] pb-40 font-sans">
-    <header class="p-6 bg-white rounded-b-[3rem] shadow-sm mb-6">
-        <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Relatórios</h1>
-        <div class="flex bg-slate-100 p-1 rounded-2xl mt-4">
-            <button class="flex-1 py-2 text-[10px] font-black uppercase rounded-xl bg-white shadow-sm">Mensal</button>
-            <button class="flex-1 py-2 text-[10px] font-black uppercase text-slate-500">Anual</button>
-        </div>
-    </header>
+// ... dentro da tua tag <script> ...
 
-    <main class="px-6 space-y-6">
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
-            <p class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Tendência de Gastos</p>
-            <div class="h-48"><canvas id="reportChart"></canvas></div>
-        </div>
+async function salvarReceitaCompleta() {
+    const btn = document.getElementById('btn-lançar');
+    const nome = document.getElementById('nome-receita').value;
+    const preco = document.getElementById('preco-venda').value;
 
-        <div class="bg-slate-900 rounded-[2.5rem] p-6 text-white">
-            <h3 class="text-xs font-black uppercase tracking-widest mb-4 text-orange-400 italic">Alertas de Inflação</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm font-bold">Óleo Vegetal</span>
-                    <span class="text-red-400 font-black text-sm">+22%</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm font-bold">Peito Frango</span>
-                    <span class="text-red-400 font-black text-sm">+15%</span>
-                </div>
-            </div>
-        </div>
-    </main>
+    if(!nome || ingredientesParaSalvar.length === 0) {
+        alert("Preenche o nome e adiciona pelo menos um ingrediente!");
+        return;
+    }
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
-        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Início</span></a>
-        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
-        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
-        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
-        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Receitas</span></a>
-    </nav>
+    btn.innerText = "A GUARDAR...";
+    btn.disabled = true;
 
-    <script>
-        const ctx = document.getElementById('reportChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: { labels: ['S1', 'S2', 'S3', 'S4'], datasets: [{ data: [3200, 2800, 3500, 2950], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.05)' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-        });
-    </script>
-</body>
-</html>
+    try {
+        // 1. Inserir na tabela 'receitas' (minúsculo)
+        const { data: receitaCriada, error: errR } = await _supabase
+            .from('receitas') 
+            .insert([{ nome: nome, preco_venda: parseFloat(preco) }])
+            .select();
+
+        if (errR) throw errR;
+
+        const receitaId = receitaCriada[0].id;
+
+        // 2. Preparar linhas para 'ingredientes_receita' (minúsculo)
+        const linhasIngredientes = ingredientesParaSalvar.map(ing => ({
+            receita_id: receitaId,
+            mp_id: parseInt(ing.mp_id),
+            quantidade: parseFloat(ing.quantidade)
+        }));
+
+        // 3. Inserir os ingredientes
+        const { error: errI } = await _supabase
+            .from('ingredientes_receita')
+            .insert(linhasIngredientes);
+
+        if (errI) throw errI;
+
+        alert("Receita e ingredientes lançados com sucesso!");
+        window.location.reload();
+
+    } catch (error) {
+        console.error("Erro detalhado:", error);
+        alert("Erro ao guardar: " + (error.message || "Verifica o console"));
+        btn.innerText = "LANÇAR RECEITA";
+        btn.disabled = false;
+    }
+}
