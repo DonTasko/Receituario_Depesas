@@ -5,83 +5,74 @@
     <script src="supabase-config.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RestoCheck - Receitas</title>
+    <title>Receitas - RestoCheck</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-[#F8FAFC] pb-40 font-sans antialiased text-slate-900">
+<body class="bg-slate-50 pb-40 font-sans antialiased text-slate-900">
 
-    <header class="p-6 bg-white border-b border-slate-100 mb-6">
-        <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Receitas</h1>
-        <p class="text-slate-500 text-sm font-medium uppercase tracking-widest text-[10px]">Fichas Técnicas e Margens</p>
+    <header class="p-6 bg-white border-b border-slate-100">
+        <h1 class="text-3xl font-black tracking-tighter">Receitas</h1>
+        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Fichas Técnicas e Margens</p>
     </header>
 
-    <main id="lista-receitas" class="px-6 grid grid-cols-1 gap-6">
-        <p class="text-center py-20 text-slate-400 font-black uppercase text-[10px]">A carregar...</p>
+    <main id="lista-receitas" class="p-6 space-y-4">
+        <p class="text-center py-20 text-slate-400 font-bold uppercase text-[10px]">A carregar...</p>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
-        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Início</span></a>
-        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
-        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
-        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
-        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-orange-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-orange-400">Receitas</span></a>
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl z-50 text-slate-400">
+        <a href="index.html"><i class="fa-solid fa-house"></i></a>
+        <a href="mp.html"><i class="fa-solid fa-box-open"></i></a>
+        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-50 flex items-center justify-center shadow-lg"><i class="fa-solid fa-qrcode text-white"></i></div></a>
+        <a href="categorias.html"><i class="fa-solid fa-layer-group"></i></a>
+        <a href="receitas.html" class="text-orange-400"><i class="fa-solid fa-utensils"></i></a>
     </nav>
 
     <script>
         async function carregarReceitas() {
             const container = document.getElementById('lista-receitas');
-            
             try {
-                // 1. Vamos buscar as 3 tabelas separadas para evitar erros de relação
-                const { data: receitas } = await _supabase.from('receitas').select('*');
-                const { data: ingredientes } = await _supabase.from('ingredientes_receita').select('*');
-                const { data: mps } = await _supabase.from('materias_primas').select('id, preco_atual');
+                const { data, error } = await _supabase
+                    .from('receitas')
+                    .select(`
+                        *,
+                        ingredientes_receita (
+                            quantidade,
+                            materias_primas ( nome, preco_atual )
+                        )
+                    `);
 
-                if (!receitas) return;
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-center py-20 text-slate-400 font-bold uppercase text-[10px]">Nenhuma receita registada.</p>';
+                    return;
+                }
 
                 container.innerHTML = '';
-
-                receitas.forEach(prato => {
-                    // 2. Filtrar ingredientes deste prato e calcular custo
+                data.forEach(receita => {
                     let custoTotal = 0;
-                    const ingsDestePrato = ingredientes?.filter(i => i.receita_id === prato.id) || [];
-                    
-                    ingsDestePrato.forEach(ing => {
-                        const produto = mps?.find(m => m.id === ing.mp_id);
-                        if (produto) {
-                            custoTotal += (produto.preco_atual || 0) * (ing.quantidade || 0);
-                        }
+                    receita.ingredientes_receita?.forEach(ing => {
+                        custoTotal += (ing.materias_primas?.preco_atual || 0) * ing.quantidade;
                     });
-
-                    const margem = prato.preco_venda > 0 
-                        ? (((prato.preco_venda - custoTotal) / prato.preco_venda) * 100).toFixed(0) 
-                        : 0;
-
-                    const corMargem = margem < 70 ? 'text-red-500 bg-red-50' : 'text-emerald-600 bg-emerald-100';
+                    const margem = receita.preco_venda > 0 ? ((receita.preco_venda - custoTotal) / receita.preco_venda * 100).toFixed(0) : 0;
 
                     container.innerHTML += `
-                        <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100">
-                            <div class="p-6">
-                                <div class="flex justify-between items-start mb-4">
-                                    <h3 class="font-black text-lg text-slate-800">${prato.nome}</h3>
-                                    <span class="${corMargem} px-3 py-1 rounded-lg text-xs font-black">${margem}% Margem</span>
+                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+                            <h2 class="font-black text-lg uppercase text-slate-800 mb-2">${receita.nome}</h2>
+                            <div class="flex justify-between items-center border-t pt-4">
+                                <div>
+                                    <p class="text-[8px] font-black text-slate-400 uppercase">Custo</p>
+                                    <p class="font-bold text-slate-700">${custoTotal.toFixed(2)}€</p>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
-                                    <div>
-                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Custo Prod.</p>
-                                        <p class="font-bold text-slate-700">${formatarMoeda(custoTotal)}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">PVP Sugerido</p>
-                                        <p class="font-black text-orange-500">${formatarMoeda(prato.preco_venda)}</p>
-                                    </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-black text-slate-400 uppercase">Margem</p>
+                                    <p class="font-black text-orange-500">${margem}%</p>
                                 </div>
                             </div>
                         </div>`;
                 });
-            } catch (e) {
-                container.innerHTML = "Erro ao carregar dados.";
+            } catch (err) {
+                container.innerHTML = `<p class="text-red-500 text-center text-[10px] font-black uppercase">Erro de ligação ou Foreign Keys em falta.</p>`;
             }
         }
         document.addEventListener('DOMContentLoaded', carregarReceitas);
