@@ -7,15 +7,15 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Pro - RestoCheck</title>
+    <title>Scanner Automático - RestoCheck</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-slate-900 pb-40 font-sans antialiased text-white">
 
-    <header class="p-6">
+    <header class="p-6 bg-slate-900/50 backdrop-blur-md sticky top-0 z-30">
         <h1 class="text-3xl font-black tracking-tighter">Scanner</h1>
-        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Leitor de Faturas Otimizado</p>
+        <p class="text-orange-500 text-[10px] font-black uppercase tracking-widest">Atualização de Stock & Preços</p>
     </header>
 
     <main class="px-6 space-y-6">
@@ -24,59 +24,38 @@
             <canvas id="canvas" class="hidden"></canvas>
             
             <div id="placeholder" class="text-center p-10">
-                <div class="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-expand text-3xl text-slate-500"></i>
-                </div>
+                <i class="fa-solid fa-file-invoice text-4xl text-slate-600 mb-4"></i>
                 <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest leading-relaxed">
-                    Aproxima a câmara<br>da zona dos valores
+                    Alinha os itens da fatura<br>dentro desta área
                 </p>
             </div>
 
-            <div id="guia-foco" class="hidden absolute inset-8 border-2 border-orange-500/30 rounded-3xl pointer-events-none">
-                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-orange-500 rounded-tl-xl"></div>
-                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-orange-500 rounded-tr-xl"></div>
-                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-xl"></div>
-                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-orange-500 rounded-br-xl"></div>
-            </div>
-
             <div id="loading-overlay" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-20">
-                <div class="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-                <p id="status-ocr" class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">A processar imagem...</p>
+                <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p id="status-ocr" class="text-[10px] font-black uppercase tracking-widest text-orange-500">A analisar fatura...</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div id="controles" class="grid grid-cols-1 gap-4">
             <button onclick="iniciarCamera()" id="btn-foto" class="bg-white text-slate-900 py-6 rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
-                <i class="fa-solid fa-camera mr-2"></i> Ativar Câmara
+                <i class="fa-solid fa-camera mr-2"></i> Abrir Câmara
             </button>
             <button onclick="tirarFoto()" id="btn-capture" class="hidden bg-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
-                Capturar e Analisar
+                Capturar e Processar
             </button>
         </div>
 
-        <div id="resultado-scan" class="hidden bg-white rounded-[2.5rem] p-8 text-slate-900 animate-fade-in shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="font-black text-sm uppercase tracking-tighter">Dados Extraídos</h2>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Texto bruto da fatura</p>
+        <div id="resultado-scan" class="hidden bg-white rounded-[2.5rem] p-6 text-slate-900 animate-fade-in shadow-2xl">
+            <h2 class="font-black text-xs uppercase tracking-widest mb-4 text-slate-400">Produtos Identificados</h2>
+            <div id="lista-detetada" class="space-y-4">
                 </div>
-                <button onclick="location.reload()" class="w-10 h-10 bg-slate-100 rounded-full text-slate-400 flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            
-            <div id="lista-detetada" class="font-mono text-[11px] bg-slate-50 p-5 rounded-3xl border border-slate-100 text-slate-600 leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-64 overflow-y-auto">
-                </div>
-
-            <div class="mt-6">
-                <button onclick="alert('Funcionalidade em desenvolvimento: Cruzar com Stock')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px]">
-                    Sincronizar com Stock
-                </button>
-            </div>
+            <button onclick="location.reload()" class="w-full mt-6 py-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                Cancelar e Voltar
+            </button>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-800/90 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/5 z-50">
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-800/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/5 z-50">
         <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-500 text-lg"></i></a>
         <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-500 text-lg"></i></a>
         <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-900 flex items-center justify-center shadow-lg"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
@@ -93,77 +72,113 @@
         async function iniciarCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    } 
+                    video: { facingMode: 'environment', width: { ideal: 1280 } } 
                 });
                 video.srcObject = stream;
                 video.classList.remove('hidden');
-                document.getElementById('guia-foco').classList.remove('hidden');
                 document.getElementById('placeholder').classList.add('hidden');
                 document.getElementById('btn-foto').classList.add('hidden');
                 document.getElementById('btn-capture').classList.remove('hidden');
-            } catch (err) { alert("Erro ao aceder à câmara."); }
+            } catch (err) { alert("Erro ao abrir câmara."); }
         }
 
         async function tirarFoto() {
             loading.classList.remove('hidden');
             const context = canvas.getContext('2d');
-            
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // PRÉ-PROCESSAMENTO: Tons de Cinza + Contraste
-            let imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-            let pixels = imgData.data;
-            for (let i = 0; i < pixels.length; i += 4) {
-                let avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
-                let v = (avg > 125) ? 255 : 0; // Binarização (Preto ou Branco)
-                pixels[i] = pixels[i + 1] = pixels[i + 2] = v;
-            }
-            context.putImageData(imgData, 0, 0);
-
             // Parar câmara
             video.srcObject.getTracks().forEach(track => track.stop());
-            video.classList.add('hidden');
-            document.getElementById('btn-capture').classList.add('hidden');
-
-            // OCR
+            
             const imageData = canvas.toDataURL('image/png');
             
+            // OCR Processamento
             try {
                 const result = await Tesseract.recognize(imageData, 'por', {
-                    logger: m => {
-                        if(m.status === 'recognizing text') {
-                            statusOcr.innerText = `A LER: ${Math.round(m.progress * 100)}%`;
-                        }
-                    }
+                    logger: m => { if(m.status === 'recognizing text') statusOcr.innerText = `A LER: ${Math.round(m.progress * 100)}%`; }
                 });
-                exibirResultado(result.data.text);
+                processarInteligente(result.data.text);
             } catch (e) {
-                alert("Erro no processamento.");
+                alert("Erro ao ler imagem.");
                 location.reload();
             }
         }
 
-        function exibirResultado(texto) {
+        async function processarInteligente(textoBruto) {
             loading.classList.add('hidden');
             document.getElementById('resultado-scan').classList.remove('hidden');
-            const lista = document.getElementById('lista-detetada');
+            document.getElementById('controles').classList.add('hidden');
             
-            // Limpeza de texto: remove linhas vazias e símbolos estranhos
-            const textoFormatado = texto.trim().replace(/[^a-zA-Z0-9\s.,€]/g, '');
-            lista.innerText = textoFormatado || "Não foi possível detetar texto legível.";
+            const { data: produtosStock } = await _supabase.from('materias_primas').select('*');
+            const listaUI = document.getElementById('lista-detetada');
+            listaUI.innerHTML = "";
+            
+            const textoCheck = textoBruto.toLowerCase();
+            let encontrou = false;
+
+            produtosStock.forEach(prod => {
+                if (textoCheck.includes(prod.nome.toLowerCase())) {
+                    encontrou = true;
+                    // Tenta extrair um preço do texto bruto próximo ao nome (lógica simples de regex)
+                    const regexPreco = /([\d]+[.,][\d]{2})/;
+                    const precoCapturado = textoBruto.match(regexPreco) ? textoBruto.match(regexPreco)[0].replace(',', '.') : prod.preco_atual;
+
+                    listaUI.innerHTML += `
+                        <div class="bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="font-black text-slate-800 text-sm uppercase">${prod.nome}</h3>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-left">Stock Atual: ${prod.stock_atual} ${prod.unidade || 'un'}</p>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-orange-500"></i>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="text-[8px] font-black uppercase text-slate-400 ml-2">Novo Preço (€)</label>
+                                    <input type="number" id="pr-${prod.id}" value="${precoCapturado}" step="0.01" class="w-full bg-white border border-slate-200 p-3 rounded-2xl text-xs font-bold text-slate-700">
+                                </div>
+                                <div>
+                                    <label class="text-[8px] font-black uppercase text-slate-400 ml-2">Qtd. Entrada</label>
+                                    <input type="number" id="qt-${prod.id}" value="1" class="w-full bg-white border border-slate-200 p-3 rounded-2xl text-xs font-bold text-slate-700">
+                                </div>
+                            </div>
+                            <button onclick="atualizarStock(${prod.id}, document.getElementById('pr-${prod.id}').value, document.getElementById('qt-${prod.id}').value)" 
+                                    class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest active:scale-95 transition-all shadow-lg">
+                                Confirmar Entrada
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+
+            if (!encontrou) {
+                listaUI.innerHTML = `<div class="text-center py-10"><i class="fa-solid fa-face-frown text-slate-300 text-3xl mb-4"></i><p class="text-slate-400 font-bold text-[10px] uppercase">Não reconheci produtos do stock nesta imagem.</p></div>`;
+            }
+        }
+
+        async function atualizarStock(id, novoPreco, quantidadeComprada) {
+            try {
+                // Buscar stock atual
+                const { data: p } = await _supabase.from('materias_primas').select('stock_atual').eq('id', id).single();
+                const novoStock = parseFloat(p.stock_atual || 0) + parseFloat(quantidadeComprada);
+
+                // Update
+                const { error } = await _supabase.from('materias_primas')
+                    .update({ preco_atual: parseFloat(novoPreco), stock_atual: novoStock })
+                    .eq('id', id);
+
+                if (error) throw error;
+                alert("Stock e Preço atualizados!");
+                location.reload();
+            } catch (err) { alert("Erro: " + err.message); }
         }
     </script>
 
     <style>
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .shadow-glow { filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.4)); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </body>
 </html>
