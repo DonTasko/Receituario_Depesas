@@ -91,12 +91,23 @@
 
         // --- GESTÃO DE FORNECEDORES ---
         async function loadFornecedores() {
-            const { data } = await _supabase.from('fornecedores').select('*');
-            const lista = document.getElementById('lista-fornecedores');
-            lista.innerHTML = data.map(f => `
-                <span class="bg-slate-100 text-slate-500 px-3 py-2 rounded-lg border border-slate-200">${f.nome}</span>
-            `).join('');
+    const lista = document.getElementById('lista-fornecedores');
+    try {
+        const { data, error } = await _supabase.from('fornecedores').select('*');
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            lista.innerHTML = '<p class="text-slate-400 text-[10px]">Cria o teu primeiro fornecedor acima.</p>';
+            return;
         }
+
+        lista.innerHTML = data.map(f => `
+            <span class="bg-slate-100 text-slate-500 px-3 py-2 rounded-lg border border-slate-200">${f.nome}</span>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+    }
+}
 
         async function addFornecedor() {
             const nome = document.getElementById('forn-nome').value;
