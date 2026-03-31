@@ -1,80 +1,53 @@
-<body class="bg-[#F8FAFC] pb-32">
-
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receitas - RestoCheck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-[#F8FAFC] pb-40 font-sans">
     <header class="p-6 flex justify-between items-end">
         <div>
             <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Receitas</h1>
-            <p class="text-slate-500 text-sm font-medium">32 Pratos Ativos</p>
+            <p class="text-slate-500 text-sm font-medium">Margem e Custo Real</p>
         </div>
-        <button class="bg-orange-500 text-white w-12 h-12 rounded-2xl shadow-lg shadow-orange-200 flex items-center justify-center active:scale-90 transition">
-            <i class="fa-solid fa-plus text-xl"></i>
-        </button>
+        <button class="bg-orange-500 text-white w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center"><i class="fa-solid fa-plus"></i></button>
     </header>
 
-    <main class="px-6 space-y-8">
-
+    <main class="px-6 space-y-12">
         <div class="relative group">
             <div class="relative h-64 w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80" 
-                     class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="Bacalhau">
+                <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                
                 <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
                     <span class="text-[10px] font-black text-slate-800 uppercase italic">Lucro: 72%</span>
                 </div>
             </div>
-
-            <div class="absolute -bottom-4 left-4 right-4 bg-white rounded-[2rem] p-6 shadow-xl border border-slate-50">
+            <div class="absolute -bottom-6 left-4 right-4 bg-white rounded-[2rem] p-6 shadow-xl border border-slate-50">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-xl font-bold text-slate-800">Bacalhau à Brás</h3>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Custo por Dose: <span class="text-slate-900">3.42€</span></p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Custo Dose: <span class="text-slate-900">3.42€</span></p>
                     </div>
                     <div class="text-right">
                         <p class="text-2xl font-black text-orange-500">14.90€</p>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Preço Venda</p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">Venda</p>
                     </div>
                 </div>
-
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="bg-slate-100 text-[9px] font-bold px-3 py-1 rounded-full text-slate-600">Bacalhau (220g)</span>
-                    <span class="bg-slate-100 text-[9px] font-bold px-3 py-1 rounded-full text-slate-600">Ovos (3un)</span>
-                    <span class="bg-red-50 text-[9px] font-bold px-3 py-1 rounded-full text-red-500 border border-red-100">Batata Palha ↑</span>
-                </div>
-
-                <button class="w-full py-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-xs font-black text-slate-800 uppercase tracking-widest transition">
-                    Editar Ficha Técnica
-                </button>
+                <button class="w-full py-3 bg-slate-50 rounded-xl text-xs font-black text-slate-800 uppercase tracking-widest">Ficha Técnica</button>
             </div>
         </div>
-
-        <div class="relative group pt-16">
-            <div class="relative h-64 w-full rounded-[2.5rem] overflow-hidden grayscale">
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" 
-                     class="w-full h-full object-cover" alt="Salada">
-                <div class="absolute inset-0 bg-red-900/20"></div>
-                
-                <div class="absolute top-4 left-4 bg-red-600 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-lg">
-                    <i class="fa-solid fa-triangle-exclamation text-white text-[10px]"></i>
-                    <span class="text-[10px] font-black text-white uppercase">Margem em Queda</span>
-                </div>
-            </div>
-
-            <div class="absolute -bottom-4 left-4 right-4 bg-white rounded-[2rem] p-6 shadow-xl">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800 opacity-60">Bowl Veggie</h3>
-                        <p class="text-[10px] font-bold text-red-500 uppercase">Custo: 5.10€ <span class="text-slate-400 font-normal ml-2">Subiu 1.20€</span></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-black text-slate-400 italic">10.00€</p>
-                    </div>
-                </div>
-                <button class="w-full py-3 border-2 border-red-100 rounded-xl text-xs font-black text-red-500 uppercase">
-                    Ajustar Preço Urgente
-                </button>
-            </div>
-        </div>
-
     </main>
+
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
+        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Início</span></a>
+        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
+        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
+        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
+        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-orange-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-orange-400">Receitas</span></a>
+    </nav>
 </body>
+</html>
