@@ -3,7 +3,6 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RestoCheck - Receitas</title>
@@ -18,10 +17,7 @@
     </header>
 
     <main id="lista-receitas" class="px-6 grid grid-cols-1 gap-6">
-        <div class="flex flex-col items-center justify-center py-20 text-slate-400">
-            <i class="fa-solid fa-circle-notch animate-spin text-2xl mb-4"></i>
-            <p class="font-black uppercase text-[10px] tracking-widest">A carregar menu...</p>
-        </div>
+        <p class="text-center py-20 text-slate-400 font-black uppercase text-[10px]">A carregar...</p>
     </main>
 
     <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
@@ -37,65 +33,43 @@
             const container = document.getElementById('lista-receitas');
             
             try {
-                // Busca as receitas e os ingredientes associados
-                const { data: receitas, error } = await _supabase
-                    .from('receitas')
-                    .select(`
-                        *,
-                        ingredientes_receita (
-                            quantidade,
-                            materias_primas (preco_atual)
-                        )
-                    `);
+                // 1. Vamos buscar as 3 tabelas separadas para evitar erros de relação
+                const { data: receitas } = await _supabase.from('receitas').select('*');
+                const { data: ingredientes } = await _supabase.from('ingredientes_receita').select('*');
+                const { data: mps } = await _supabase.from('materias_primas').select('id, preco_atual');
 
-                if (error) throw error;
+                if (!receitas) return;
 
-                // Se não houver dados
-                if (!receitas || receitas.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-10">
-                            <p class="text-slate-400 font-bold uppercase text-[10px]">Nenhuma receita encontrada.</p>
-                        </div>`;
-                    return;
-                }
-
-                container.innerHTML = ''; // Limpa o carregamento
+                container.innerHTML = '';
 
                 receitas.forEach(prato => {
-                    // Cálculo do Custo Real
+                    // 2. Filtrar ingredientes deste prato e calcular custo
                     let custoTotal = 0;
-                    if (prato.ingredientes_receita) {
-                        prato.ingredientes_receita.forEach(ing => {
-                            const precoUnitario = ing.materias_primas?.preco_atual || 0;
-                            custoTotal += precoUnitario * (ing.quantidade || 0);
-                        });
-                    }
+                    const ingsDestePrato = ingredientes?.filter(i => i.receita_id === prato.id) || [];
+                    
+                    ingsDestePrato.forEach(ing => {
+                        const produto = mps?.find(m => m.id === ing.mp_id);
+                        if (produto) {
+                            custoTotal += (produto.preco_atual || 0) * (ing.quantidade || 0);
+                        }
+                    });
 
-                    // Cálculo da Margem
                     const margem = prato.preco_venda > 0 
                         ? (((prato.preco_venda - custoTotal) / prato.preco_venda) * 100).toFixed(0) 
                         : 0;
 
                     const corMargem = margem < 70 ? 'text-red-500 bg-red-50' : 'text-emerald-600 bg-emerald-100';
 
-                    const card = `
-                        <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100 animate-fade-in">
-                            <div class="h-40 bg-slate-200 relative">
-                                <img src="${prato.imagem_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}" 
-                                     class="w-full h-full object-cover" 
-                                     onerror="this.src='https://via.placeholder.com/400x200?text=Sem+Imagem'">
-                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
-                                    <span class="text-[10px] font-black uppercase text-slate-800">${prato.categoria || 'Geral'}</span>
-                                </div>
-                            </div>
+                    container.innerHTML += `
+                        <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100">
                             <div class="p-6">
                                 <div class="flex justify-between items-start mb-4">
-                                    <h3 class="font-black text-lg text-slate-800 leading-tight">${prato.nome}</h3>
+                                    <h3 class="font-black text-lg text-slate-800">${prato.nome}</h3>
                                     <span class="${corMargem} px-3 py-1 rounded-lg text-xs font-black">${margem}% Margem</span>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                                     <div>
-                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Custo Matéria</p>
+                                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Custo Prod.</p>
                                         <p class="font-bold text-slate-700">${formatarMoeda(custoTotal)}</p>
                                     </div>
                                     <div class="text-right">
@@ -104,23 +78,13 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
+                        </div>`;
                 });
-
-            } catch (err) {
-                console.error("Erro Geral:", err);
-                container.innerHTML = `<p class="text-red-500 text-center font-bold">Erro ao ligar à base de dados.</p>`;
+            } catch (e) {
+                container.innerHTML = "Erro ao carregar dados.";
             }
         }
-
         document.addEventListener('DOMContentLoaded', carregarReceitas);
     </script>
-
-    <style>
-        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </body>
 </html>
