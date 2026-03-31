@@ -53,7 +53,7 @@
                 <button onclick="addFornecedor()" class="bg-slate-100 px-6 rounded-2xl text-slate-900"><i class="fa-solid fa-check"></i></button>
             </div>
             
-            <div id="lista-fornecedores" class="mt-4 flex flex-wrap gap-2 text-[10px] font-bold uppercase">
+            <div id="lista-Fornecedores" class="mt-4 flex flex-wrap gap-2 text-[10px] font-bold uppercase">
                 </div>
         </section>
 
@@ -91,7 +91,7 @@
 
         // --- GESTÃO DE FORNECEDORES ---
         async function loadFornecedores() {
-    const lista = document.getElementById('lista-fornecedores');
+    const lista = document.getElementById('lista-Fornecedores');
     try {
         const { data, error } = await _supabase.from('Fornecedores').select('*');
         if (error) throw error;
@@ -113,7 +113,7 @@
             const nome = document.getElementById('forn-nome').value;
             if(!nome) return;
             
-            const { error } = await _supabase.from('fornecedores').insert([{ nome }]);
+            const { error } = await _supabase.from('Fornecedores').insert([{ nome }]);
             if (error) alert(error.message);
             else {
                 document.getElementById('forn-nome').value = '';
