@@ -3,11 +3,11 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner - RestoCheck</title>
+    <title>Scanner Pro - RestoCheck</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -15,83 +15,138 @@
 
     <header class="p-6">
         <h1 class="text-3xl font-black tracking-tighter">Scanner</h1>
-        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Leitor de Faturas</p>
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Leitor de Faturas Otimizado</p>
     </header>
 
     <main class="px-6 space-y-6">
-        <div id="camera-container" class="relative aspect-[3/4] bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-slate-700 overflow-hidden flex items-center justify-center">
+        <div id="camera-container" class="relative aspect-[3/4] bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-slate-700 overflow-hidden flex items-center justify-center shadow-2xl">
             <video id="video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
             <canvas id="canvas" class="hidden"></canvas>
+            
             <div id="placeholder" class="text-center p-10">
-                <i class="fa-solid fa-file-invoice text-5xl text-slate-600 mb-4 shadow-glow"></i>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Alinha a fatura aqui</p>
+                <div class="w-20 h-20 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-expand text-3xl text-slate-500"></i>
+                </div>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest leading-relaxed">
+                    Aproxima a câmara<br>da zona dos valores
+                </p>
             </div>
-            <div id="loading-overlay" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur flex flex-col items-center justify-center z-10">
-                <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p class="text-[10px] font-black uppercase tracking-widest">A ler dados...</p>
+
+            <div id="guia-foco" class="hidden absolute inset-8 border-2 border-orange-500/30 rounded-3xl pointer-events-none">
+                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-orange-500 rounded-tl-xl"></div>
+                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-orange-500 rounded-tr-xl"></div>
+                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-xl"></div>
+                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-orange-500 rounded-br-xl"></div>
+            </div>
+
+            <div id="loading-overlay" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-20">
+                <div class="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <p id="status-ocr" class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">A processar imagem...</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4">
-            <button onclick="iniciarCamera()" id="btn-foto" class="bg-orange-500 py-5 rounded-3xl font-black uppercase tracking-widest text-xs shadow-lg active:scale-95 transition-all">
-                <i class="fa-solid fa-camera mr-2"></i> Abrir Câmara
+            <button onclick="iniciarCamera()" id="btn-foto" class="bg-white text-slate-900 py-6 rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
+                <i class="fa-solid fa-camera mr-2"></i> Ativar Câmara
             </button>
-            <button onclick="tirarFoto()" id="btn-capture" class="hidden bg-white text-slate-900 py-5 rounded-3xl font-black uppercase tracking-widest text-xs shadow-lg active:scale-95 transition-all">
-                Capturar Agora
+            <button onclick="tirarFoto()" id="btn-capture" class="hidden bg-orange-500 text-white py-6 rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
+                Capturar e Analisar
             </button>
         </div>
 
-        <div id="resultado-scan" class="hidden bg-white rounded-[2.5rem] p-6 text-slate-900">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-black text-xs uppercase tracking-tighter">Texto Extraído</h2>
-                <button onclick="location.reload()" class="text-slate-400 text-[10px] font-bold underline">Limpar</button>
-            </div>
-            <div id="lista-detetada" class="space-y-3 max-h-60 overflow-y-auto font-mono text-[10px] bg-slate-50 p-4 rounded-2xl">
+        <div id="resultado-scan" class="hidden bg-white rounded-[2.5rem] p-8 text-slate-900 animate-fade-in shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="font-black text-sm uppercase tracking-tighter">Dados Extraídos</h2>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Texto bruto da fatura</p>
                 </div>
+                <button onclick="location.reload()" class="w-10 h-10 bg-slate-100 rounded-full text-slate-400 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div id="lista-detetada" class="font-mono text-[11px] bg-slate-50 p-5 rounded-3xl border border-slate-100 text-slate-600 leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-64 overflow-y-auto">
+                </div>
+
+            <div class="mt-6">
+                <button onclick="alert('Funcionalidade em desenvolvimento: Cruzar com Stock')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                    Sincronizar com Stock
+                </button>
+            </div>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-800/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/5 z-50 text-slate-400">
-        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-lg mb-1"></i></a>
-        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-lg mb-1"></i></a>
+    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-800/90 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/5 z-50">
+        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-slate-500 text-lg"></i></a>
+        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-500 text-lg"></i></a>
         <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-900 flex items-center justify-center shadow-lg"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
-        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-lg mb-1"></i></a>
-        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-lg mb-1"></i></a>
+        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-500 text-lg"></i></a>
+        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-500 text-lg"></i></a>
     </nav>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const loading = document.getElementById('loading-overlay');
+        const statusOcr = document.getElementById('status-ocr');
 
         async function iniciarCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                });
                 video.srcObject = stream;
                 video.classList.remove('hidden');
+                document.getElementById('guia-foco').classList.remove('hidden');
                 document.getElementById('placeholder').classList.add('hidden');
                 document.getElementById('btn-foto').classList.add('hidden');
                 document.getElementById('btn-capture').classList.remove('hidden');
-            } catch (err) { alert("Acesso à câmara negado."); }
+            } catch (err) { alert("Erro ao aceder à câmara."); }
         }
 
         async function tirarFoto() {
             loading.classList.remove('hidden');
             const context = canvas.getContext('2d');
+            
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
+
+            // PRÉ-PROCESSAMENTO: Tons de Cinza + Contraste
+            let imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+            let pixels = imgData.data;
+            for (let i = 0; i < pixels.length; i += 4) {
+                let avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+                let v = (avg > 125) ? 255 : 0; // Binarização (Preto ou Branco)
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = v;
+            }
+            context.putImageData(imgData, 0, 0);
+
             // Parar câmara
             video.srcObject.getTracks().forEach(track => track.stop());
             video.classList.add('hidden');
             document.getElementById('btn-capture').classList.add('hidden');
 
-            // 1. PROCESSAR COM TESSERACT OCR
-            const image = canvas.toDataURL('image/png');
-            const result = await Tesseract.recognize(image, 'por', { logger: m => console.log(m) });
+            // OCR
+            const imageData = canvas.toDataURL('image/png');
             
-            exibirResultado(result.data.text);
+            try {
+                const result = await Tesseract.recognize(imageData, 'por', {
+                    logger: m => {
+                        if(m.status === 'recognizing text') {
+                            statusOcr.innerText = `A LER: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
+                });
+                exibirResultado(result.data.text);
+            } catch (e) {
+                alert("Erro no processamento.");
+                location.reload();
+            }
         }
 
         function exibirResultado(texto) {
@@ -99,13 +154,16 @@
             document.getElementById('resultado-scan').classList.remove('hidden');
             const lista = document.getElementById('lista-detetada');
             
-            // Limpa e mostra o texto bruto
-            lista.innerText = texto;
-
-            // DICA: O próximo passo será criar uma lógica que procura palavras-chave 
-            // no texto (ex: "Picanha") e valores (ex: "25,00") para atualizar o Supabase.
-            alert("Leitura concluída! Verifica o texto extraído.");
+            // Limpeza de texto: remove linhas vazias e símbolos estranhos
+            const textoFormatado = texto.trim().replace(/[^a-zA-Z0-9\s.,€]/g, '');
+            lista.innerText = textoFormatado || "Não foi possível detetar texto legível.";
         }
     </script>
+
+    <style>
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .shadow-glow { filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.4)); }
+    </style>
 </body>
 </html>
