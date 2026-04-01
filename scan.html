@@ -10,52 +10,47 @@
     <script src='https://unpkg.com/tesseract.js@2.1.4/dist/tesseract.min.js'></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 pb-32 font-sans antialiased text-slate-900">
+<body class="bg-slate-100 pb-40 font-sans antialiased text-slate-900">
 
-    <header class="p-6 bg-white border-b border-slate-200 sticky top-0 z-30 flex justify-between items-center">
-        <a href="index.html" class="text-slate-400 p-2 hover:bg-slate-50 rounded-full transition-colors">
-            <i class="fa-solid fa-arrow-left text-xl"></i>
-        </a>
-        <h1 class="text-xl font-black tracking-tighter uppercase">Scanner de Faturas</h1>
+    <header class="p-6 bg-white border-b border-slate-200 sticky top-0 z-40 flex justify-between items-center shadow-sm">
+        <a href="index.html" class="text-slate-400 p-2"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+        <h1 class="text-lg font-black tracking-tighter uppercase">Scanner Inteligente</h1>
         <div class="w-10"></div>
     </header>
 
-    <main class="p-6 space-y-6">
-        <div id="drop-zone" class="bg-white p-8 rounded-[3rem] border-4 border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-4 cursor-pointer hover:border-orange-300 transition-all shadow-sm" onclick="document.getElementById('file-input').click()">
-            <div id="icon-container" class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 shadow-inner">
-                <i class="fa-solid fa-camera-retro text-3xl"></i>
-            </div>
-            <div id="text-container">
-                <p class="font-black uppercase tracking-widest text-xs text-slate-500">Digitalizar Documento</p>
-                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Imagens JPG/PNG</p>
-            </div>
-            <img id="preview" class="hidden w-full rounded-[2rem] shadow-2xl border-4 border-white">
-            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="iniciarLeitura(this)">
-        </div>
-
-        <div id="status-ocr" class="hidden bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl border-t border-white/10 overflow-hidden relative">
-            <div class="flex items-center gap-4 relative z-10">
-                <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center animate-bounce">
-                    <i class="fa-solid fa-brain text-white"></i>
-                </div>
+    <main class="p-4 space-y-6">
+        
+        <div id="status-ocr" class="hidden bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-xl animate-pulse">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-robot text-orange-400 text-2xl"></i>
                 <div class="flex-1">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">Processamento IA</p>
-                    <p id="progresso-texto" class="font-bold text-sm">A preparar motor de leitura...</p>
-                    <div class="w-full h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden">
-                        <div id="progresso-barra" class="h-full bg-orange-500 w-0 transition-all duration-300"></div>
-                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-orange-400">Análise em curso</p>
+                    <p id="progresso-texto" class="font-bold text-sm">A ler dados da fatura...</p>
                 </div>
             </div>
         </div>
 
         <div id="resultados" class="hidden space-y-4">
-            <div class="flex justify-between items-center px-4">
-                <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Produtos Reconhecidos</p>
-                <span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[8px] font-bold uppercase">OCR Ativo</span>
+            <div class="flex items-center justify-between px-2">
+                <h2 class="text-[11px] font-black uppercase text-slate-500 tracking-widest">Produtos Detetados</h2>
+                <span class="bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-lg animate-bounce">NOVO</span>
             </div>
-            <div id="lista-detecoes" class="space-y-3">
+            <div id="lista-detecoes" class="grid gap-3">
                 </div>
         </div>
+
+        <div id="drop-zone" class="bg-white p-8 rounded-[2.5rem] border-4 border-dashed border-slate-200 flex flex-col items-center justify-center text-center cursor-pointer hover:border-orange-400 transition-all shadow-sm" onclick="document.getElementById('file-input').click()">
+            <div id="ui-upload">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4 mx-auto shadow-inner">
+                    <i class="fa-solid fa-camera text-2xl"></i>
+                </div>
+                <p class="font-black uppercase tracking-widest text-[10px] text-slate-400">Carregar Fatura do Lidl/Fornecedor</p>
+            </div>
+            
+            <img id="preview" class="hidden w-full rounded-3xl mt-4 border border-slate-100 shadow-lg grayscale-[0.5] opacity-50">
+            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="iniciarLeitura(this)">
+        </div>
+
     </main>
 
     <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl z-50 text-slate-400 border border-white/5">
@@ -75,114 +70,109 @@
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
 
-            // Reset visual
-            document.getElementById('icon-container').classList.add('hidden');
-            document.getElementById('text-container').classList.add('hidden');
+            // Feedback visual
+            document.getElementById('ui-upload').classList.add('hidden');
             const preview = document.getElementById('preview');
             preview.src = URL.createObjectURL(file);
             preview.classList.remove('hidden');
             
-            const statusDiv = document.getElementById('status-ocr');
-            const progressoTexto = document.getElementById('progresso-texto');
-            const progressoBarra = document.getElementById('progresso-barra');
-            
-            statusDiv.classList.remove('hidden');
+            document.getElementById('status-ocr').classList.remove('hidden');
             document.getElementById('resultados').classList.add('hidden');
 
             try {
-                progressoTexto.innerText = "A carregar dicionário de dados...";
-                
-                // Execução do OCR
-                const result = await Tesseract.recognize(
-                    file,
-                    'por',
-                    { 
-                        logger: m => {
-                            if(m.status === 'recognizing text') {
-                                const p = (m.progress * 100).toFixed(0);
-                                progressoTexto.innerText = `A ler fatura: ${p}%`;
-                                progressoBarra.style.width = `${p}%`;
-                            }
+                // OCR simplificado
+                const result = await Tesseract.recognize(file, 'por', { 
+                    logger: m => {
+                        if(m.status === 'recognizing text') {
+                            document.getElementById('progresso-texto').innerText = `A extrair texto: ${(m.progress * 100).toFixed(0)}%`;
                         }
                     }
-                );
+                });
 
-                console.log("Texto extraído com sucesso.");
-                processarTextoDeteção(result.data.text.toLowerCase());
+                processarTextoInteligente(result.data.text.toLowerCase());
 
             } catch (err) {
-                console.error("Erro OCR:", err);
-                alert("Erro ao processar imagem. Verifica a ligação à internet.");
+                console.error(err);
+                alert("Erro ao ler imagem.");
             } finally {
-                statusDiv.classList.add('hidden');
+                document.getElementById('status-ocr').classList.add('hidden');
             }
         }
 
-        async function processarTextoDeteção(textoFatura) {
-    // Limpeza: Remove quebras de linha excessivas e ruído comum de faturas
-    const textoLimpo = textoFatura.replace(/\s+/g, ' ');
-    
-    const { data: produtos } = await _supabase.from('materias_primas').select('*');
-    const listaDetecoes = document.getElementById('lista-detecoes');
-    listaDetecoes.innerHTML = '';
-    let contador = 0;
-
-    produtos.forEach(prod => {
-        const nomeProd = prod.nome.toLowerCase();
-        
-        if (textoLimpo.includes(nomeProd)) {
-            contador++;
+        async function processarTextoInteligente(textoBruto) {
+            // Limpa o texto de ruído e marcas de água comuns
+            const textoFatura = textoBruto.replace(/\n/g, ' ').replace(/\s+/g, ' ');
             
-            // Procura o valor logo a seguir ao nome (num raio de 50 caracteres)
-            // Esta regex ignora o texto no meio e apanha o primeiro valor tipo 0,00 ou 0.00
-            const trechoPosNome = textoLimpo.substring(textoLimpo.indexOf(nomeProd), textoLimpo.indexOf(nomeProd) + 80);
-            const matchPreco = trechoPosNome.match(/(\d+[.,]\d{2})/);
-            
-            const valorSugerido = matchPreco ? matchPreco[1].replace(',', '.') : prod.preco_atual;
+            const { data: produtos } = await _supabase.from('materias_primas').select('*');
+            const listaDetecoes = document.getElementById('lista-detecoes');
+            listaDetecoes.innerHTML = '';
+            let contador = 0;
 
-            listaDetecoes.innerHTML += `
-                <div class="bg-white p-5 rounded-[2rem] border border-slate-200 flex justify-between items-center shadow-sm">
-                    <div class="flex-1">
-                        <p class="font-black text-slate-800 uppercase text-[11px] leading-tight">${prod.nome}</p>
-                        <p class="text-[9px] text-slate-400 font-bold mt-1">STOCK: ${prod.preco_atual}€</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="text-right">
-                            <p class="text-[8px] font-black text-orange-500 mb-1">NA FATURA</p>
-                            <input type="number" step="0.01" value="${valorSugerido}" id="p-${prod.id}" 
-                                class="w-20 p-2 bg-slate-50 border border-slate-200 rounded-xl text-right font-black text-sm outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                        <button onclick="atualizarBD(${prod.id})" class="bg-slate-900 text-white w-10 h-10 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    </div>
-                </div>`;
+            produtos.forEach(prod => {
+                const nomeProd = prod.nome.toLowerCase();
+                
+                // Busca EXATA por palavra (para não confundir "Bife" com "Bifana")
+                const regexBusca = new RegExp("\\b" + nomeProd + "\\b", "i");
+                
+                if (regexBusca.test(textoFatura)) {
+                    contador++;
+                    
+                    // Extração de preço: Procura o primeiro valor decimal após o nome do produto
+                    const indexNome = textoFatura.indexOf(nomeProd);
+                    const pedacoTexto = textoFatura.substring(indexNome, indexNome + 120);
+                    const matchPreco = pedacoTexto.match(/(\d+[.,]\d{2})/);
+                    
+                    // Se encontrar o preço unitário (ex: 19,99) no Lidl, ele está perto do nome
+                    const valorEncontrado = matchPreco ? matchPreco[1].replace(',', '.') : prod.preco_atual;
+
+                    listaDetecoes.innerHTML += `
+                        <div class="bg-white p-5 rounded-[2rem] border-l-8 border-l-orange-500 shadow-md flex justify-between items-center animate-in fade-in slide-in-from-top-4">
+                            <div class="flex-1">
+                                <p class="font-black text-slate-800 text-xs uppercase">${prod.nome}</p>
+                                <p class="text-[9px] text-slate-400 font-bold">STOCK: ${prod.preco_atual}€</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-right">
+                                    <p class="text-[8px] font-black text-orange-500 uppercase italic">Lido na Fatura</p>
+                                    <input type="number" step="0.01" value="${valorEncontrado}" id="p-${prod.id}" 
+                                        class="w-20 p-2 bg-slate-50 border border-slate-200 rounded-xl text-right font-black text-sm outline-none focus:ring-2 focus:ring-orange-500 shadow-inner">
+                                </div>
+                                <button onclick="confirmarPreco(${prod.id})" class="bg-slate-900 text-white w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-all">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                }
+            });
+
+            if (contador === 0) {
+                listaDetecoes.innerHTML = `
+                    <div class="bg-white p-8 rounded-[2.5rem] text-center border-2 border-slate-100">
+                        <p class="text-slate-400 font-black text-[10px] uppercase tracking-widest leading-loose">
+                            Não detetei produtos.<br>
+                            <span class="text-orange-300">Dica: Tira a foto apenas à lista de artigos.</span>
+                        </p>
+                    </div>`;
+            }
+            
+            document.getElementById('resultados').classList.remove('hidden');
+            // Scroll suave para os resultados
+            document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
         }
-    });
 
-    if (contador === 0) {
-        listaDetecoes.innerHTML = `<div class="p-10 text-center text-slate-400 font-bold text-xs">NÃO DETETADO (Dica: Tira a foto bem de cima e evita sombras)</div>`;
-    }
-    document.getElementById('resultados').classList.remove('hidden');
-}
-        async function atualizarBD(id) {
+        async function confirmarPreco(id) {
             const input = document.getElementById(`p-${id}`);
             const novoValor = parseFloat(input.value);
 
-            const { error } = await _supabase
-                .from('materias_primas')
-                .update({ preco_atual: novoValor })
-                .eq('id', id);
+            const { error } = await _supabase.from('materias_primas').update({ preco_atual: novoValor }).eq('id', id);
 
             if (!error) {
-                input.parentElement.parentElement.classList.add('opacity-40');
+                const card = input.closest('div.bg-white');
+                card.classList.replace('border-l-orange-500', 'border-l-green-500');
+                card.style.opacity = '0.6';
                 input.disabled = true;
-                // Feedback visual de sucesso
-                const btn = input.parentElement.nextElementSibling;
-                btn.classList.replace('bg-slate-900', 'bg-green-500');
-                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
             } else {
-                alert("Erro ao atualizar preço.");
+                alert("Erro ao gravar.");
             }
         }
     </script>
