@@ -3,43 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lançar Receita - RestoCheck</title>
+    <title>Lançar/Editar Receita - RestoCheck</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 pb-32 font-sans antialiased text-slate-900">
+<body class="bg-slate-100 pb-32 font-sans antialiased text-slate-900">
 
-    <header class="p-6 bg-white border-b border-slate-100 sticky top-0 z-30 flex justify-between items-center">
+    <header class="p-6 bg-white border-b border-slate-200 sticky top-0 z-30 flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Nova Receita</h1>
-            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Criar Ficha Técnica</p>
+            <h1 id="titulo-pagina" class="text-3xl font-black text-slate-900 tracking-tighter uppercase">Nova Receita</h1>
+            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Ficha Técnica</p>
         </div>
-        <a href="lista_receitas.html" class="bg-slate-100 p-3 rounded-2xl text-slate-600">
-            <i class="fa-solid fa-list-ul"></i>
+        <a href="lista_receitas.html" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-arrow-left"></i>
         </a>
     </header>
 
     <main class="p-6 space-y-6">
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
             <div class="space-y-4">
-                <input type="text" id="nome-receita" placeholder="Nome da Receita (Ex: Bife Grelhado)" 
-                    class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 font-bold placeholder:text-slate-300">
+                <p class="text-[10px] font-black uppercase text-slate-400 ml-2">Dados Principais</p>
+                <input type="text" id="nome-receita" placeholder="Nome da Receita" 
+                    class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none font-bold text-lg">
                 
                 <input type="number" id="preco-venda" placeholder="Preço de Venda (€)" 
-                    class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 font-bold placeholder:text-slate-300">
+                    class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none font-bold text-lg">
                 
-                <div class="pt-6 border-t border-slate-50">
-                    <p class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest text-left">Ingredientes</p>
+                <div class="pt-6 mt-4 border-t border-slate-100">
+                    <p class="text-[10px] font-black uppercase text-slate-400 mb-3 ml-2">Adicionar Ingredientes</p>
                     <div class="flex gap-2">
-                        <select id="select-mp" class="flex-1 p-4 bg-slate-50 rounded-2xl border-none font-bold text-sm outline-none appearance-none">
+                        <select id="select-mp" class="flex-1 p-4 bg-slate-50 rounded-2xl border border-slate-200 font-bold text-sm outline-none appearance-none">
                             <option>A carregar produtos...</option>
                         </select>
                         <input type="number" id="qtd-ingrediente" placeholder="Qtd" 
-                            class="w-20 p-4 bg-slate-50 rounded-2xl border-none font-bold text-center">
-                        <button onclick="adicionarIngredienteNaLista()" class="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 transition-transform">
-                            <i class="fa-solid fa-plus"></i>
+                            class="w-20 p-4 bg-slate-50 rounded-2xl border border-slate-200 font-bold text-center outline-none">
+                        <button onclick="adicionarIngredienteNaLista()" class="bg-orange-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 transition-all shadow-md shadow-orange-100">
+                            <i class="fa-solid fa-plus text-xl"></i>
                         </button>
                     </div>
                 </div>
@@ -48,8 +49,8 @@
                     </ul>
 
                 <button onclick="salvarReceitaCompleta()" id="btn-salvar" 
-                    class="w-full bg-orange-500 text-white p-5 rounded-[2rem] font-black uppercase tracking-widest shadow-lg shadow-orange-200 mt-8 active:scale-95 transition-all">
-                    Gravar Receita
+                    class="w-full bg-slate-900 text-white p-5 rounded-[2rem] font-black uppercase tracking-widest shadow-xl mt-8 active:scale-95 transition-all">
+                    Guardar Alterações
                 </button>
             </div>
         </div>
@@ -59,7 +60,7 @@
         <a href="index.html" class="p-4"><i class="fa-solid fa-house"></i></a>
         <a href="mp.html" class="p-4"><i class="fa-solid fa-box-open"></i></a>
         <a href="scan.html" class="relative -mt-14">
-            <div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-50 flex items-center justify-center shadow-lg text-white text-xl">
+            <div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-100 flex items-center justify-center shadow-lg text-white text-xl">
                 <i class="fa-solid fa-qrcode"></i>
             </div>
         </a>
@@ -69,39 +70,81 @@
 
     <script>
         let listaIngredientes = [];
+        let idEdicao = new URLSearchParams(window.location.search).get('edit');
+
+        async function inicializar() {
+            await carregarProdutos();
+            if (idEdicao) {
+                document.getElementById('titulo-pagina').innerText = "Editar Receita";
+                document.getElementById('btn-salvar').innerText = "Atualizar Ficha Técnica";
+                await carregarDadosParaEdicao();
+            }
+        }
 
         async function carregarProdutos() {
-            try {
-                // Aqui usamos 'materias_primas' em minúsculas conforme tens no Supabase
-                const { data, error } = await _supabase.from('materias_primas').select('*').order('nome');
-                if (error) throw error;
+            const { data } = await _supabase.from('materias_primas').select('*').order('nome');
+            const select = document.getElementById('select-mp');
+            select.innerHTML = data.map(mp => `<option value="${mp.id}">${mp.nome} (${mp.unidade})</option>`).join('');
+        }
 
-                const select = document.getElementById('select-mp');
-                select.innerHTML = data.map(mp => 
-                    `<option value="${mp.id}">${mp.nome} (${mp.unidade})</option>`
-                ).join('');
-            } catch (err) {
-                console.error("Erro ao carregar produtos:", err);
+        async function carregarDadosParaEdicao() {
+            // 1. Puxa os dados da receita
+            const { data: receita } = await _supabase.from('receitas').select('*').eq('id', idEdicao).single();
+            if (receita) {
+                document.getElementById('nome-receita').value = receita.nome;
+                document.getElementById('preco-venda').value = receita.preco_venda;
+            }
+
+            // 2. Puxa os ingredientes
+            const { data: ings } = await _supabase
+                .from('ingredientes_receita')
+                .select('*, materias_primas(nome, unidade)')
+                .eq('receita_id', idEdicao);
+
+            if (ings) {
+                ings.forEach(i => {
+                    listaIngredientes.push({ 
+                        mp_id: i.mp_id, 
+                        quantidade: i.quantidade, 
+                        nome: i.materias_primas.nome + " (" + i.materias_primas.unidade + ")"
+                    });
+                });
+                renderizarLista();
             }
         }
 
         function adicionarIngredienteNaLista() {
             const select = document.getElementById('select-mp');
             const qtd = document.getElementById('qtd-ingrediente').value;
-            const nomeMp = select.options[select.selectedIndex].text;
-            const idMp = select.value;
-
             if (!qtd || qtd <= 0) return alert("Insira uma quantidade!");
 
-            listaIngredientes.push({ mp_id: idMp, quantidade: qtd, nome: nomeMp });
-
-            document.getElementById('lista-temp-ingredientes').innerHTML += `
-                <li class="flex justify-between items-center bg-slate-100 p-4 rounded-2xl border border-slate-200">
-                    <span class="font-bold text-slate-700 text-sm italic">${nomeMp}</span>
-                    <span class="bg-white px-4 py-1 rounded-xl font-black text-xs text-orange-600 shadow-sm">${qtd}</span>
-                </li>`;
-            
+            listaIngredientes.push({ 
+                mp_id: select.value, 
+                quantidade: qtd, 
+                nome: select.options[select.selectedIndex].text 
+            });
+            renderizarLista();
             document.getElementById('qtd-ingrediente').value = '';
+        }
+
+        function removerDaLista(index) {
+            listaIngredientes.splice(index, 1);
+            renderizarLista();
+        }
+
+        function renderizarLista() {
+            const ul = document.getElementById('lista-temp-ingredientes');
+            ul.innerHTML = listaIngredientes.map((ing, index) => `
+                <li class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-200 animate-in fade-in slide-in-from-right-2">
+                    <div>
+                        <p class="font-black text-slate-700 text-sm italic">${ing.nome}</p>
+                        <p class="text-[10px] font-bold text-orange-500 uppercase">${ing.quantidade} unidades/kg</p>
+                    </div>
+                    <button onclick="removerDaLista(${index})" class="text-slate-300 hover:text-red-500 p-2">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </button>
+                </li>
+            `).join('');
         }
 
         async function salvarReceitaCompleta() {
@@ -109,49 +152,47 @@
             const nome = document.getElementById('nome-receita').value;
             const preco = document.getElementById('preco-venda').value;
 
-            if (!nome || listaIngredientes.length === 0) {
-                return alert("Falta o nome ou os ingredientes!");
-            }
+            if (!nome || listaIngredientes.length === 0) return alert("Falta o nome ou ingredientes!");
 
-            btn.innerText = "A GUARDAR...";
+            btn.innerText = "A PROCESSAR...";
             btn.disabled = true;
 
             try {
-                // 1. Criar a Receita
-                const { data: receitaCriada, error: errR } = await _supabase
-                    .from('receitas')
-                    .insert([{ nome: nome, preco_venda: parseFloat(preco) || 0 }])
-                    .select();
+                let receitaId = idEdicao;
 
-                if (errR) throw errR;
-                const receitaId = receitaCriada[0].id;
+                if (idEdicao) {
+                    // MODO EDIÇÃO: Atualiza a receita e apaga ingredientes antigos para por os novos
+                    await _supabase.from('receitas').update({ nome: nome, preco_venda: parseFloat(preco) }).eq('id', idEdicao);
+                    await _supabase.from('ingredientes_receita').delete().eq('receita_id', idEdicao);
+                } else {
+                    // MODO NOVO: Cria nova receita
+                    const { data, error } = await _supabase.from('receitas').insert([{ nome: nome, preco_venda: parseFloat(preco) }]).select();
+                    if (error) throw error;
+                    receitaId = data[0].id;
+                }
 
-                // 2. Preparar Ingredientes (Corrigindo o Ponto 3 com parseInt/parseFloat)
-                const linhasIngredientes = listaIngredientes.map(ing => ({
+                // Insere os ingredientes (comuns aos dois modos)
+                const rows = listaIngredientes.map(ing => ({
                     receita_id: receitaId,
                     mp_id: parseInt(ing.mp_id),
                     quantidade: parseFloat(ing.quantidade)
                 }));
 
-                // 3. Inserir na tabela de ligação
-                const { error: errI } = await _supabase
-                    .from('ingredientes_receita')
-                    .insert(linhasIngredientes);
-
+                const { error: errI } = await _supabase.from('ingredientes_receita').insert(rows);
                 if (errI) throw errI;
 
-                alert("✅ Ficha Técnica guardada!");
+                alert("✅ Sucesso!");
                 window.location.href = 'lista_receitas.html';
 
             } catch (error) {
-                console.error("Erro:", error);
-                alert("Erro ao guardar. Verifica se criaste as Policies de INSERT no Supabase.");
-                btn.innerText = "GRAVAR RECEITA";
+                console.error(error);
+                alert("Erro ao gravar. Verifica o console.");
+                btn.innerText = "TENTAR NOVAMENTE";
                 btn.disabled = false;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', carregarProdutos);
+        document.addEventListener('DOMContentLoaded', inicializar);
     </script>
 </body>
 </html>
