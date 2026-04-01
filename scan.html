@@ -119,51 +119,52 @@
         }
 
         async function processarTextoDeteção(textoFatura) {
-            const { data: produtos } = await _supabase.from('materias_primas').select('*');
-            const listaDetecoes = document.getElementById('lista-detecoes');
-            listaDetecoes.innerHTML = '';
-            let contador = 0;
+    // Limpeza: Remove quebras de linha excessivas e ruído comum de faturas
+    const textoLimpo = textoFatura.replace(/\s+/g, ' ');
+    
+    const { data: produtos } = await _supabase.from('materias_primas').select('*');
+    const listaDetecoes = document.getElementById('lista-detecoes');
+    listaDetecoes.innerHTML = '';
+    let contador = 0;
 
-            produtos.forEach(prod => {
-                // Procura o nome exato do produto no meio do texto da fatura
-                if (textoFatura.includes(prod.nome.toLowerCase())) {
-                    contador++;
-                    
-                    // Lógica para tentar encontrar o preço (número perto do nome)
-                    const regex = new RegExp(prod.nome.toLowerCase() + "[^0-9]{0,25}([0-9]+[.,][0-9]{2})", "i");
-                    const match = textoFatura.match(regex);
-                    const valorFatura = match ? match[1].replace(',', '.') : prod.preco_atual;
+    produtos.forEach(prod => {
+        const nomeProd = prod.nome.toLowerCase();
+        
+        if (textoLimpo.includes(nomeProd)) {
+            contador++;
+            
+            // Procura o valor logo a seguir ao nome (num raio de 50 caracteres)
+            // Esta regex ignora o texto no meio e apanha o primeiro valor tipo 0,00 ou 0.00
+            const trechoPosNome = textoLimpo.substring(textoLimpo.indexOf(nomeProd), textoLimpo.indexOf(nomeProd) + 80);
+            const matchPreco = trechoPosNome.match(/(\d+[.,]\d{2})/);
+            
+            const valorSugerido = matchPreco ? matchPreco[1].replace(',', '.') : prod.preco_atual;
 
-                    listaDetecoes.innerHTML += `
-                        <div class="bg-white p-5 rounded-[2rem] border border-slate-200 flex justify-between items-center shadow-sm animate-in fade-in slide-in-from-bottom-3">
-                            <div class="flex-1">
-                                <p class="font-black text-slate-800 uppercase text-[11px] leading-tight">${prod.nome}</p>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Atual: ${prod.preco_atual}€</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="text-right">
-                                    <p class="text-[8px] font-black text-orange-500 uppercase mb-1">Novo Preço</p>
-                                    <input type="number" step="0.01" value="${valorFatura}" id="p-${prod.id}" 
-                                        class="w-20 p-2 bg-slate-50 border border-slate-200 rounded-xl text-right font-black text-sm outline-none focus:ring-2 focus:ring-orange-500">
-                                </div>
-                                <button onclick="atualizarBD(${prod.id})" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center active:scale-90 transition-all shadow-lg">
-                                    <i class="fa-solid fa-check text-lg"></i>
-                                </button>
-                            </div>
-                        </div>`;
-                }
-            });
-
-            if (contador === 0) {
-                listaDetecoes.innerHTML = `
-                    <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200 text-center">
-                        <i class="fa-solid fa-magnifying-glass text-slate-200 text-4xl mb-4"></i>
-                        <p class="text-slate-400 font-black text-[10px] uppercase tracking-widest leading-relaxed">Não foram encontrados produtos<br>conhecidos nesta fatura.</p>
-                    </div>`;
-            }
-            document.getElementById('resultados').classList.remove('hidden');
+            listaDetecoes.innerHTML += `
+                <div class="bg-white p-5 rounded-[2rem] border border-slate-200 flex justify-between items-center shadow-sm">
+                    <div class="flex-1">
+                        <p class="font-black text-slate-800 uppercase text-[11px] leading-tight">${prod.nome}</p>
+                        <p class="text-[9px] text-slate-400 font-bold mt-1">STOCK: ${prod.preco_atual}€</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p class="text-[8px] font-black text-orange-500 mb-1">NA FATURA</p>
+                            <input type="number" step="0.01" value="${valorSugerido}" id="p-${prod.id}" 
+                                class="w-20 p-2 bg-slate-50 border border-slate-200 rounded-xl text-right font-black text-sm outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <button onclick="atualizarBD(${prod.id})" class="bg-slate-900 text-white w-10 h-10 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                </div>`;
         }
+    });
 
+    if (contador === 0) {
+        listaDetecoes.innerHTML = `<div class="p-10 text-center text-slate-400 font-bold text-xs">NÃO DETETADO (Dica: Tira a foto bem de cima e evita sombras)</div>`;
+    }
+    document.getElementById('resultados').classList.remove('hidden');
+}
         async function atualizarBD(id) {
             const input = document.getElementById(`p-${id}`);
             const novoValor = parseFloat(input.value);
