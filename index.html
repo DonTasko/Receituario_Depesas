@@ -1,116 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RestoCheck - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - RestoCheck</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-[#F8FAFC] pb-40 font-sans antialiased text-slate-900">
+<body class="bg-slate-100 pb-32 font-sans antialiased text-slate-900">
 
-    <nav class="sticky top-0 z-30 bg-slate-900 text-white p-6 rounded-b-[2.5rem] shadow-xl">
-        <div class="flex justify-between items-center mb-6">
+    <header class="p-8 bg-white border-b border-slate-200 rounded-b-[3rem] shadow-sm">
+        <div class="flex justify-between items-center">
             <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Bem-vindo, DonTasko</p>
-                <h1 class="text-xl font-black italic tracking-tighter uppercase">Resto<span class="text-orange-500">Check</span></h1>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Bem-vindo ao Tasko</p>
+                <h1 class="text-3xl font-black tracking-tighter">Dashboard</h1>
             </div>
-            <a href="relatorios.html" class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700">
-                <i class="fa-solid fa-chart-line text-orange-400"></i>
-            </a>
-        </div>
-
-        <div class="bg-slate-800 rounded-[2rem] p-5 border border-slate-700 shadow-inner">
-            <div class="flex justify-between items-end mb-3">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gastos Totais (Stock)</span>
-                <span id="total-gastos" class="text-2xl font-black text-white">0,00€</span>
-            </div>
-            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                <div class="bg-orange-500 h-full w-[75%] shadow-[0_0_15px_rgba(249,115,22,0.6)]"></div>
+            <div class="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-200">
+                <i class="fa-solid fa-user-tie"></i>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="px-6 -mt-6">
-        <div class="flex gap-4 overflow-x-auto no-scrollbar snap-x mb-8 pt-2">
-            <div class="min-w-[160px] snap-center p-4 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-red-500 uppercase mb-1">Inflação: Carne</p>
-                <p class="text-xs text-slate-600 font-bold leading-tight">+12% na última compra</p>
+    <main class="p-6 space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1">Total Receitas</p>
+                <p id="count-receitas" class="text-2xl font-black text-slate-900">--</p>
             </div>
-            <div class="min-w-[160px] snap-center p-4 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-emerald-500 uppercase mb-1">Margem Ok</p>
-                <p class="text-xs text-slate-600 font-bold leading-tight">Média de 72% nos pratos</p>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 mb-6">
-            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Custos por Categoria</h3>
-            <div class="h-56">
-                <canvas id="mainDashboardChart"></canvas>
+            <div class="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1">Artigos Stock</p>
+                <p id="count-mp" class="text-2xl font-black text-slate-900">--</p>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-            <a href="scan.html" class="bg-orange-500 text-white p-6 rounded-[2.5rem] shadow-xl shadow-orange-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
-                <i class="fa-solid fa-qrcode text-2xl"></i>
-                <span class="font-black text-[10px] uppercase tracking-widest text-center leading-tight">Scanner<br>Fatura</span>
+            <a href="lista_receitas.html" class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 hover:scale-[1.02] transition-all active:scale-95">
+                <div class="w-16 h-16 bg-orange-100 rounded-[1.5rem] flex items-center justify-center text-orange-600 text-2xl">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <span class="font-black text-[11px] uppercase tracking-widest text-slate-600">Receitas</span>
             </a>
-            <a href="relatorios.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all">
-                <i class="fa-solid fa-file-invoice-dollar text-2xl text-blue-500"></i>
-                <span class="font-black text-[10px] text-slate-700 uppercase tracking-widest text-center leading-tight">Ver<br>Relatórios</span>
+
+            <a href="mp.html" class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 hover:scale-[1.02] transition-all active:scale-95">
+                <div class="w-16 h-16 bg-blue-100 rounded-[1.5rem] flex items-center justify-center text-blue-600 text-2xl">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <span class="font-black text-[11px] uppercase tracking-widest text-slate-600">Stock MP</span>
+            </a>
+
+            <a href="categorias.html" class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 hover:scale-[1.02] transition-all active:scale-95">
+                <div class="w-16 h-16 bg-purple-100 rounded-[1.5rem] flex items-center justify-center text-purple-600 text-2xl">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <span class="font-black text-[11px] uppercase tracking-widest text-slate-600">Gestão</span>
+            </a>
+
+            <a href="scan.html" class="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl flex flex-col items-center justify-center gap-4 hover:scale-[1.02] transition-all active:scale-95">
+                <div class="w-16 h-16 bg-orange-500 rounded-[1.5rem] flex items-center justify-center text-white text-2xl">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <span class="font-black text-[11px] uppercase tracking-widest text-white">Scanner</span>
             </a>
         </div>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl border border-white/10 z-50">
-        <a href="index.html" class="flex flex-col items-center"><i class="fa-solid fa-house text-orange-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-orange-400">Início</span></a>
-        <a href="mp.html" class="flex flex-col items-center"><i class="fa-solid fa-box-open text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Stock</span></a>
-        <a href="scan.html" class="relative -mt-14"><div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-[#F8FAFC] flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-qrcode text-white text-2xl"></i></div></a>
-        <a href="categorias.html" class="flex flex-col items-center"><i class="fa-solid fa-layer-group text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Categorias</span></a>
-        <a href="receitas.html" class="flex flex-col items-center"><i class="fa-solid fa-utensils text-slate-400 text-lg mb-1"></i><span class="text-[8px] font-black uppercase text-slate-500">Receitas</span></a>
-    </nav>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script>
-        async function inicializarDashboard() {
-            // 1. Puxar dados da tabela materias_primas
-            const { data, error } = await _supabase
-                .from('materias_primas')
-                .select('preco_atual, nome');
-
-            if (error) {
-                console.error("Erro Supabase:", error.message);
-                return;
-            }
-
-            // 2. Calcular Total
-            const total = data.reduce((acc, item) => acc + (item.preco_atual || 0), 0);
-            document.getElementById('total-gastos').innerText = formatarMoeda(total);
-
-            // 3. Atualizar o Gráfico com dados reais
-            const labels = data.map(item => item.nome).slice(0, 3); // Top 3 itens
-            const valores = data.map(item => item.preco_atual).slice(0, 3);
-
-            const ctx = document.getElementById('mainDashboardChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels.length > 0 ? labels : ['Sem Dados'],
-                    datasets: [{ 
-                        data: valores.length > 0 ? valores : [0], 
-                        backgroundColor: ['#f97316', '#3b82f6', '#94a3b8'], 
-                        borderRadius: 15 
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, border: { display: false } } } }
-            });
+        async function loadStats() {
+            const { count: countR } = await _supabase.from('receitas').select('*', { count: 'exact', head: true });
+            const { count: countM } = await _supabase.from('materias_primas').select('*', { count: 'exact', head: true });
+            
+            document.getElementById('count-receitas').innerText = countR || 0;
+            document.getElementById('count-mp').innerText = countM || 0;
         }
-
-        // Rodar ao carregar
-        document.addEventListener('DOMContentLoaded', inicializarDashboard);
+        document.addEventListener('DOMContentLoaded', loadStats);
     </script>
 </body>
 </html>
