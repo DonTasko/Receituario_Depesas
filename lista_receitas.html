@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minhas Receitas - RestoCheck</title>
+    <title>Receitas - RestoCheck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 pb-32 font-sans antialiased text-slate-900">
+<body class="bg-slate-100 pb-32 font-sans antialiased">
 
-    <header class="p-6 bg-white border-b border-slate-200 sticky top-0 z-30 flex justify-between items-center">
+    <header class="p-8 bg-white border-b border-slate-200 sticky top-0 z-30 flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Fichas Técnicas</h1>
-            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Consulta de Custos e Margens</p>
+            <h1 class="text-2xl font-black tracking-tighter uppercase text-slate-900">Fichas Técnicas</h1>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Consulta de Custos</p>
         </div>
-        <a href="receitas.html" class="bg-orange-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
-            <i class="fa-solid fa-plus"></i>
+        <a href="criar_receita.html" class="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-200 active:scale-90 transition-transform">
+            <i class="fa-solid fa-plus text-xl"></i>
         </a>
     </header>
 
-    <main id="lista-cards" class="p-6 space-y-4">
-        <div class="text-center py-20 text-slate-400 font-bold animate-pulse uppercase text-[10px]">A calcular custos reais...</div>
+    <main class="p-6" id="lista-container">
+        <div class="flex flex-col items-center justify-center py-20 text-slate-300">
+            <i class="fa-solid fa-circle-notch animate-spin text-3xl mb-4"></i>
+            <p class="text-[10px] font-black uppercase tracking-widest">A carregar receitas...</p>
+        </div>
     </main>
 
     <nav class="fixed bottom-6 left-6 right-6 h-20 bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-around px-2 shadow-2xl z-50 text-slate-400">
         <a href="index.html" class="p-4"><i class="fa-solid fa-house"></i></a>
         <a href="mp.html" class="p-4"><i class="fa-solid fa-box-open"></i></a>
         <a href="scan.html" class="relative -mt-14">
-            <div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-100 flex items-center justify-center shadow-lg text-white">
+            <div class="bg-orange-500 w-16 h-16 rounded-full border-[6px] border-slate-100 flex items-center justify-center shadow-lg text-white text-xl">
                 <i class="fa-solid fa-qrcode"></i>
             </div>
         </a>
@@ -39,105 +42,51 @@
 
     <script>
         async function carregarReceitas() {
-            const container = document.getElementById('lista-cards');
+            const container = document.getElementById('lista-container');
             
-            try {
-                // Puxamos a receita + ingredientes + preço da matéria prima
-                const { data: receitas, error } = await _supabase
-                    .from('receitas')
-                    .select(`
-                        *,
-                        ingredientes_receita (
-                            quantidade,
-                            materias_primas ( nome, preco_atual, unidade )
-                        )
-                    `)
-                    .order('created_at', { ascending: false });
+            // Query corrigida: Removido o .order('created_at') para evitar o erro de coluna inexistente
+            const { data: receitas, error } = await _supabase
+                .from('receitas')
+                .select(`
+                    *,
+                    ingredientes_receita (
+                        quantidade,
+                        materias_primas ( preco_atual )
+                    )
+                `);
 
-                if (error) throw error;
-
-                if (receitas.length === 0) {
-                    container.innerHTML = `<div class="text-center py-20 text-slate-400 font-bold uppercase text-xs">Nenhuma receita encontrada.</div>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-
-                receitas.forEach(receita => {
-                    let custoTotal = 0;
-
-                    // Cálculo do custo baseado nos ingredientes
-                    receita.ingredientes_receita.forEach(ing => {
-                        const precoUnitario = ing.materias_primas?.preco_atual || 0;
-                        custoTotal += precoUnitario * ing.quantidade;
-                    });
-
-                    const margem = receita.preco_venda > 0 
-                        ? (((receita.preco_venda - custoTotal) / receita.preco_venda) * 100).toFixed(0) 
-                        : 0;
-
-                    container.innerHTML += `
-                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200 relative">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h2 class="font-black text-xl tracking-tighter uppercase text-slate-800 leading-tight">${receita.nome}</h2>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase italic">Atualizado em: ${new Date(receita.created_at).toLocaleDateString()}</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="${margem > 65 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                        ${margem}% Margem
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                                <div>
-                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest text-left font-bold">Custo Prod.</p>
-                                    <p class="font-black text-slate-700 text-lg text-left">${custoTotal.toFixed(2)}€</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest font-bold">PVP Sugerido</p>
-                                    <p class="font-black text-orange-600 text-lg">${receita.preco_venda.toFixed(2)}€</p>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between items-center mt-4 px-2">
-                                <button onclick="apagarReceita(${receita.id})" class="text-[10px] font-black text-red-400 uppercase hover:text-red-600 transition-colors">
-                                    <i class="fa-solid fa-trash-can mr-1"></i> Apagar
-                                </button>
-                                
-                                <button onclick="editarReceita(${receita.id})" class="text-[10px] font-black text-slate-900 bg-slate-100 px-4 py-2 rounded-xl uppercase hover:bg-slate-200 transition-all">
-                                    <i class="fa-solid fa-pen-to-square mr-1"></i> Editar
-                                </button>
-                            </div>
-                        </div>`;
-                });
-
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = `<div class="bg-red-50 p-6 rounded-3xl text-red-500 font-bold text-xs text-center border border-red-100">Erro ao carregar dados. Verifica as Foreign Keys no Supabase!</div>`;
+            if (error) {
+                container.innerHTML = `<div class="bg-red-50 text-red-500 p-6 rounded-[2rem] text-center font-bold text-xs uppercase border border-red-100">Erro: ${error.message}</div>`;
+                return;
             }
-        }
 
-        function editarReceita(id) {
-            // Redireciona para a página de criação com o parâmetro de edição
-            window.location.href = `receitas.html?edit=${id}`;
-        }
-
-        async function apagarReceita(id) {
-            if(!confirm("Tens a certeza que queres eliminar esta ficha técnica?")) return;
-            
-            try {
-                // 1. Apaga primeiro os ingredientes (dependência)
-                await _supabase.from('ingredientes_receita').delete().eq('receita_id', id);
-                // 2. Apaga a receita
-                const { error } = await _supabase.from('receitas').delete().eq('id', id);
-                
-                if(error) throw error;
-                window.location.reload();
-            } catch (err) {
-                alert("Erro ao apagar. Verifica as policies de DELETE no Supabase.");
+            if (receitas.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-slate-400 font-black text-[10px] uppercase tracking-widest">Nenhuma receita encontrada.</div>`;
+                return;
             }
+
+            container.innerHTML = receitas.map(r => {
+                // Cálculo do custo total da receita
+                const custoTotal = r.ingredientes_receita.reduce((acc, ing) => {
+                    const preco = ing.materias_primas?.preco_atual || 0;
+                    return acc + (preco * ing.quantidade);
+                }, 0);
+
+                return `
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200 mb-4 flex items-center justify-between group active:scale-[0.98] transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-slate-50 rounded-[1.5rem] flex items-center justify-center text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-500 transition-colors">
+                            <i class="fa-solid fa-utensils text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-slate-900 uppercase text-sm tracking-tight">${r.nome}</h3>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Custo Matéria: <span class="text-orange-500">${custoTotal.toFixed(2)}€</span></p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-200"></i>
+                </div>
+                `;
+            }).join('');
         }
 
         document.addEventListener('DOMContentLoaded', carregarReceitas);
